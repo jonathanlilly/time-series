@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+name: motivation
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[Motivation]
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#A View of the Ocean
+<video preload="auto" width="95%" height="auto"  data-setup="{}" autoplay loop controls><source src="../videos/goldmovie.mp4" type="video/mp4" /></video>
+
+From a high-resolution numerical model of the ocean currents by Harper Simmons. Color is a normalized measure of current speed.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Studying the Currents
+
+<img style="width:95%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/deploying.jpg">
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Surface Drifter Basics
+
+.left-column[<img style="width:100%;"  src="../figures/drifterschematic.gif">]
+.right-column[<img style="width:100%;margin-top:-1em;"  src="../figures/drifterpic1.jpg">
+
+A basketball-sized surface float with a 6&nbsp;m long drogue centered at 15&nbsp;m depth.
+
+Position communicated by satellite roughly every hour.]
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#The Surface Drifter Dataset
+
+<video preload="auto" width="95%" height="auto"  data-setup="{}" autoplay loop controls><source src="../videos/driftermovie.mp4" type="video/mp4" /></video>
+
+Animation of the entire surface drifter dataset. Color = Speed.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#A Drifter &ldquo;Spaghetti Plot&rdquo;
+
+<img style="width:100%"  src="../figures/highresspaghetti.png">
+
+Trajectories from NOAA's Global Drifter Program
+30 million data points, 20 thousand time series
+
+(That's big for oceanography!)
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Mean Current Speed
+
+<img style="width:100%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/globalinertialspeed.png">
+
+Formed by binning in latitude and longitude, then averaging.
+Easy to compute maps of low-order statistics: mean, variance, etc.
+
+Clearly does not capture full richness of dataset.
+What else can be done?
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Time Series Analysis
+
+Extracting information from time series, like the drifter trajectories, is the domain of *time series analysis*, or *signal processing*.
+
+The goal of time series analysis is (i) to extract as much useful information as possible from the data, while at the same time, (ii) avoiding mis-interpretation of artifacts and spurious features.
+
+Time series analysis has much overlap with statistics.  For example, statistical methods are often used to test hypotheses that can be framed using time series analysis.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Motivation and Overview
+We will look at three different techniques for time series analysis:
+
+1. Fourier spectral analysis
+2. Time-frequency analysis using wavelets
+3. Stochastic modeling
+
+
+These methods address the information in the drifter trajectories in different ways, and are suitable for different physical phenomena.
+
+
+Three particular phenomena of interest are  *ocean vortex structures*, *large-scale diffusivity*, and *wind-forced oscillations*.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#An Oceanic Vortex
+
+<video preload="auto" width="100%" height="auto"  data-setup="{}" autoplay loop controls><source src="../videos/nonlineareddyparticlemovie.mp4" type="video/mp4" /></video>
+
+A simulation of an oceanic vortex (or &ldquo;eddy&rdquo;) by Jeffrey Early.
+Domain size is 2000&times;1000 km.  Color is initial longitude.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Sample Drifter Trajectory
+
+<img style="width:65%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/bettymap.png">
+
+Black = continents, gray = continental shelves (500 m depth).
+Red line is the trajectory of one single instrument.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#The First Tool: Your Eyes
+
+<img style="width:100%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/bettycurrents.png">
+
+This is the velocity corresponding to the previous trajectory.
+Blue = east/west velocity, Red = north/south velocity.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#A Naive Spectral Estimate
+
+<img style="width:100%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/bettyperiodogram.png">
+
+A decomposition into negatively and positively rotating circles.
+&ldquo;Naive&rdquo; means it is what you use if you don't know better.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#A Better Spectral Estimate
+
+<img style="width:100%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/bettyspectra.png">
+
+Features of the spectrum are now readily apparent.
+This uses Thomson's (1982) multitaper method, the best general method.
+
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#A Wavelet Transform
+
+<img style="width:75%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/gulfstream_example2.png">
+
+Here we decompose the variability across time *and* frequency.
+The time information reveals critical links between the phenomena.
+
+---
+class: center
+#Drifter Spectra
+
+<img style="width:49%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../figures/highreslatitudespectra.png">
+
+Spectral density of surface drifter velocities.  Tides are vertical lines.
+The energetic curve is due to wind-forced *inertial oscillations.*
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Ocean Turbulence
+
+<video preload="auto" width="60%" height="auto"  data-setup="{}" autoplay loop controls><source src="../videos/turbulencemovie.mp4" type="video/mp4" /></video>
+
+An idealized model of oceanic turbulence by Jeffrey Early.
+Shading is speed with particle trajectories shown in color.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Vortex-Driven Diffusivity
+
+<video preload="auto" width="100%" height="auto"  data-setup="{}" autoplay loop controls><source src="../videos/dispersionmovie.mp4" type="video/mp4" /></video>
+
+Trajectories from the numerical model (left)
+versus realizations of a three-parameter stochastic model (right).
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Summary
+
+
+The rich structure present in surface drifter trajectories motivates the development of new time series analysis tools.
+
+
+The tools we use to analyze data matter.  Better, or more suitable, tools let us extract more information from available data.
+
+
+Next we will turn our attention to fundamentals of time series analysis, before continuing on to discuss novel methodologies.
+
+
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>

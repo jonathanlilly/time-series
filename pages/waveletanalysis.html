@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+
+name: waveletanalysis
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[The Wavelet Transform]
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#  In-Class Assignments
+
+Beginning with the forward Fourier transform equation
+
+`\[G(\omega) = \int_{-\infty}^{\infty} g(t)\, e^{-i\omega t} dt\]`
+
+use this equation to answer the following:
+
+`\begin{align}
+?\quad &\Longleftrightarrow\quad  G(\omega/L)\\
+?\quad &\Longleftrightarrow\quad  G(\omega-\omega_o)\\
+? \quad&\Longleftrightarrow\quad G'(\omega)\\
+    ?\quad&\Longleftrightarrow\quad  1\\
+     ?\quad& \Longleftrightarrow \quad e^{i  \omega t_o}\\
+     ?\quad &\Longleftrightarrow \quad  \cos( \omega t_o)\\
+     ? \quad & \Longleftrightarrow \quad \int_{-\infty}^{\infty} F(\nu) G(\omega-\nu) d\nu
+\end{align}`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Reverse Reflections
+
+These reverse reflection equations are:
+`\begin{align}
+  L g(tL)\quad &\Longleftrightarrow\quad  G(\omega/L)\\
+   e^{i\omega_o t } g(t) &\Longleftrightarrow\quad  G(\omega-\omega_o)
+     \\
+ -i t g(t) \quad&\Longleftrightarrow\quad G'(\omega)\\
+     \delta(t) \quad&\Longleftrightarrow\quad  1\\
+      \delta(t-t_o)\quad& \Longleftrightarrow \quad e^{-i  \omega t_o}\\
+      \frac{1}{2}\delta(t-t_o)+\frac{1}{2} \delta(t+t_o)\quad &\Longleftrightarrow \quad  \cos( \omega t_o)\\
+     f(t)g(t) \quad & \Longleftrightarrow \quad \int_{-\infty}^{\infty} F(\nu) G(\omega-\nu) d\nu
+\end{align}`
+
+These could also have been inferred from the forward reflection equations by noting the symmetry of the Fourier pair relationship:
+`\begin{equation}
+g(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} G(\omega)\, e^{i\omega t} d\omega,\quad\quad  G(\omega)\equiv  \int_{-\infty}^{\infty} g(t)\, e^{-i\omega t}  d t.
+\end{equation}`
+
+<!--
+class: left, .toc[[&#10023;](../index.html)]
+#In-Class Assignments
+6. With `$N$` being the length of your data, compute <tt>fs=morsespace(3,beta,N);</tt> for
+ <tt>beta</tt>=3 followed by <tt>psi=morsewave(N,3,beta,fs);</tt> and then <tt>w=wavetrans(x,{3,beta,fs});</tt>. Plot this using <tt>wavespecplot(t,x,2*pi./fs,w);</tt> where <tt>t</tt> is the time axis and <tt>x</tt> is your data.
+7. Try different colormaps including <tt>colormap lansey</tt>.
+1. Repeat step #1 with larger value <tt>beta</tt>=10, or other values of your choice.  <tt>beta</tt> should be greater than or equal to 1/2.
+1. The `$y$`-axis here is in periods.  Make sure that you have it in physical units, e.g. days or hours.
+1. Repeat steps #1 and #3 but with the time series being an array of zeros of the same length as your data, with a delta function (that is, a one) in the center.
+1.  Do the same but for a time series consisting of a cosine of your choice.  Mark the period of the cosine as a horizontal line in your wavelet transform.  Does it match what you see in the transform?-->
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Bandpass Filtering
+
+Previously we looked at the convolution theorem:
+`\[h(t)= \int_{-\infty}^{\infty} f(\tau) g(t-\tau) d\tau =\frac{1}{2\pi}\int_{-\infty}^{\infty} F(\omega) G(\omega) \, e^{i\omega t} d\omega.\]`
+
+If `$g(t)$` is smooth,  the convolution creates a *smoothed version* of `$f(t)$`.
+
+If `$g(t)$` has a Fourier transform `$G(\omega)$` is localized in the vicinity of a certain frequency `$\omega_o$`, then  `$h(t)$` will also be localized around `$\omega_o$`.
+
+In this case the convolution becomes a *bandpass filter*.
+
+
+--
+What is a good example of a function `$g(t)$` whose Fourier transform `$G(\omega)$` is localized around zero?
+
+
+--
+What is a good example of a function `$g(t)$` whose Fourier transform `$G(\omega)$` is localized around `$\omega_o$`?
+
+--
+`\[g(t) e^{i\omega_o t} \Longleftrightarrow G(\omega-\omega_o) \]`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#A Modulated Gaussian
+<center><img style="width:80%"  src="../../figures/waveletdemo5.png"></center>
+
+The function `$g(t) e^{i\omega_o t}$` where `$g(t)$` is a Gaussian.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#One-Sided Bandpass
+
+If we create a bandpass filter, using the shift theorem, by modulating some function `$g(t)$` whose Fourier transform is localized around zero, we obtain the new function <!--\tilde{\hspace{0pt}G}(\omega)=-->
+
+`\[\tilde{\hspace{0pt}g}(t)\equiv g(t) e^{i\omega_o t} \Longleftrightarrow G(\omega-\omega_o). \]`
+
+The bandpass filter `$\tilde{\hspace{0pt}g}(t)$` will localize in the vicinity of frequency `$\omega_o$`.
+
+Thus, if `$\omega_o$` is chosen to be positive (and sufficiently large), we will isolate a band of positive frequencies, and if  `$\omega_o$` is chosen to be negative, we will isolate a band of negative frequencies.
+
+This is called a *one-sided* bandpass filter.  An example of a two-sided bandpass filter would be
+
+`\[ g(t) \cos(\omega_o t) \Longleftrightarrow [G(\omega-\omega_o)+G(\omega+\omega_o)]/2. \]`
+
+Note that a one-sided bandpass is necessarily complex-valued, because it will be something like a complex exponential with a localizing envelope.
+
+<!-- This turns out to be desireable, as it interfaces with an important theory called the *analytic signal method*.-->
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#A Wavelet Transform
+
+<center><img style="width:85%;margin-top:-0.2em;margin-bottom:-0.2em"  src="../../figures/gulfstream_example2.png"></center>
+
+<!--For bivariate data, `$z=u+iv$`, we have two transforms, `$u$` and `$v$` or the positive and negatively rotary transforms.-->
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Basic Idea
+
+The wavelet transform is essentially a stack (or set) of one-sided bandpasses at different frequencies.
+
+We bandpass the time series at many different choices of the center of the band, then we look at these all together.
+
+We will work with a particular type of wavelet that is *strictly* one-sided, that is, having no energy at negative frequencies.
+
+Such a wavelet is said to be *analytic*.  It is built up entirely from contributions due to positively-rotating Fourier components.
+
+To isolate the negatively-rotating variability we use the complex conjugate of the analytic wavelet.  This filter has no support at positive frequencies as is said to be *anti-analytic*.
+
+<!--The particular type of wavelet we will work with is called a generalized Morse wavelet.  It is controlled by two parameters, denoted `$\beta$` and `$\gamma$`.-->
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Wavelet Transform
+
+The wavelet transform is written as
+
+`\[w(t,s) = \int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{\tau-t}{s}\right) z(\tau) d\tau.\]`
+
+This describes the act of filtering the data with a rescaled versions of a filter `$\psi(t)$`, where `$s$` is the rescaling parameter or *scale*.
+
+Compare the wavelet transform definition with the convolution
+`\[ (f\ast g)(t)\equiv  \int_{-\infty}^{\infty} f(\tau) g(t-\tau) d\tau.\]`
+What are the differences?
+
+
+--
+(i) In the wavelet transform, the output depends upon our choice of scale `$s$`, (ii) the wavlet transform has a conjugation, and (iii) the wavelet transform has `$\tau-t$` rather than `$t-\tau$`.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Cross-Correlation
+
+In fact the wavelet transform is based on a close relative of the convolution called the *cross-correlation*, defined as
+`\[(f\star g)(t)=\int_{-\infty}^{\infty}  f^*(\tau-t) g(\tau) d\tau= \int_{-\infty}^{\infty} f^*(\tau) g(\tau+t) d\tau
+\]`
+
+which is just a different way to filter one time series with another.  Unlike the convolution, the cross-correlation is not symmetric.
+
+The frequency-domain expression of this action is given by the *cross-correlation theorem*,
+
+`\begin{multline}
+(f\star g)(t)=\int_{-\infty}^{\infty}   f^*(\tau-t) g(\tau) d\tau= \int_{-\infty}^{\infty} f^*(\tau) g(\tau+t) d\tau
+\\=\frac{1}{2\pi}\int_{-\infty}^{\infty} F^*(\omega) G(\omega) \, e^{i\omega t} d\omega
+\end{multline}`
+
+where a conjugation now appears acting on `$F(\omega)$`.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+##Convolution vs. Cross-Correlation
+
+The convolution theorem:
+
+`\begin{multline}
+(f * g)(t)=\int_{-\infty}^{\infty}   f(t-\tau) g(\tau) d\tau= \int_{-\infty}^{\infty} f(\tau) g(t-\tau) d\tau
+\\=\frac{1}{2\pi}\int_{-\infty}^{\infty} F(\omega) G(\omega) \, e^{i\omega t} d\omega
+\end{multline}`
+
+&ldquo;A convolution in time is a multiplication in frequency.&rdquo;
+
+
+The cross-correlation theorem:
+
+`\begin{multline}
+(f\star g)(t)=\int_{-\infty}^{\infty}   f^*(\tau-t) g(\tau) d\tau= \int_{-\infty}^{\infty} f^*(\tau) g(\tau+t) d\tau
+\\=\frac{1}{2\pi}\int_{-\infty}^{\infty} F^*(\omega) G(\omega) \, e^{i\omega t} d\omega
+\end{multline}`
+
+&ldquo;A cross-correlation in time is a multiplication in frequency *with the first function conjugated.*&rdquo;
+
+
+
+
+<!--Note that the term &lsquo;cross-correlation&rsquo; also has other meanings!-->
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Cross-Correlation Proof
+
+
+`\begin{multline}h(t)= \int_{-\infty}^{\infty} f^*(\tau-t) g(\tau) d\tau
+\\= \int_{-\infty}^{\infty} \left[\frac{1}{2\pi} \int_{-\infty}^{\infty} F^*(\omega)\, e^{-i\omega (\tau-t)} d\omega\right]\left[\frac{1}{2\pi} \int_{-\infty}^{\infty} G(\nu)\, e^{i\nu\tau} d\nu\right] d\tau \\
+=
+\frac{1}{(2\pi)^2}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}  F^*(\omega) G(\nu) \, e^{i(\nu-\omega) \tau+ i\omega t} d \tau \, d\omega \, d\nu   \\
+=\frac{1}{2\pi}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}  F^*(\omega) G(\nu) \, e^{i\omega t}\left[ \frac{1}{2\pi}\int_{-\infty}^{\infty} e^{i(\nu-\omega) \tau} d\tau \right] d\omega \, d\nu \\
+=\frac{1}{2\pi}\int_{-\infty}^{\infty} F^*(\omega) e^{i\omega t}\left[\int_{-\infty}^{\infty}  G(\nu) \, \delta(\nu-\omega)  d\nu \right] d\omega \\
+  =\frac{1}{2\pi}\int_{-\infty}^{\infty} F^*(\omega) G(\omega) \, e^{i\omega t} d\omega
+\end{multline}`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Wavelet Transform
+
+We see that the wavelet transform  is the filtration of `$z(t)$` with  rescaled versions of  `$\psi(t)$` using the cross-correlation operator:
+
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau\]`
+
+From the cross-correlation theorem and scaling theorems, we have
+
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
+
+for the frequency-domain form of the wavelet transform.
+
+Thus, if `$\Psi(\omega)$` is localized around a particular frequency, then `$\Psi(s\omega)$` is localized around a *different frequency*.
+
+For this reason we can think of the wavelet transform as a set of bandpasses.  For each `$s$` value, the wavelet transform `$w(t,s)$` will be localized around a different frequency.
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Two Key Transforms
+
+Two essential transforms are when the signal of interest consists of delta function in time or a delta function in frequency.
+
+If `$z(t)=\delta(t-t_o)$` then we have
+
+`\begin{align}w(t,s) &=\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau\\
+&=\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) \delta(\tau-t_o) d\tau=\frac{1}{s} \psi^*\left(\frac{t-t_o}{s}\right)
+\end{align}`
+
+while if `$Z(\omega)=2\pi \delta(\omega-\omega)$`  then `$z(t)=e^{i\omega_o t}$` and
+
+`\begin{align}
+w(t,s) &=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega \\&=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) \left[2\pi\delta(\omega-\omega_o)\right] e^{i\omega t} d\omega= \Psi^*(s\omega_o) e^{i\omega_o t}.\end{align}`
+
+We see how wavelet itself is imprinted onto the wavelet transform.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#A Wavelet in Time
+<center><img style="width:75%"  src="../../figures/waveletdemo2.png"></center>
+
+A typical example of a complex-valued wavelet in the time domain.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Role of Scale `$s$`
+<center><img style="width:75%"  src="../../figures/waveletdemo3.png"></center>
+
+Real part of the time-domain wavelet `$\frac{1}{s}\psi(t/s)$` for different  `$s$`.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Role of Scale `$s$`
+<center><img style="width:75%"  src="../../figures/waveletdemo4.png"></center>
+
+The frequency-domain wavelet `$\Psi(s\omega)$` for different choices of  `$s$`.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Examples of Wavelets
+<center><img style="width:60%"  src="../../figures/morsie_families_new.png"></center>
+
+A broad family of wavelets in the time domain.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Examples of Wavelets
+<center><img style="width:60%"  src="../../figures/morsie_families_fourier.png"></center>
+
+The same family of wavelets in the frequency domain.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#That's Pretty Much It
+
+So the wavelet transform is simply a stack of one-sided bandpasses.
+
+This means the magnitude-squared of the wavelets transform, `$|w(t,s)|^2$`, describes the variability in the vicinity of a certain time `$t$` and also a certain period of oscillation, set by the scale `$s$`.
+
+It is convenient to convert the scale `$s$` into an equivalent frequency, the *scale frequency*, which ends up being proportional to `$1/s$`.
+
+The wavelet can be thought of as a *definition* of an oscillatory signal, and the magnitude of the wavelet transform as the magnitude of the local *projection* onto time and frequency shifted versions of that test signal.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Which Wavelet to Use?
+
+One stumbling block used to be determining which wavelet to use.
+
+&ldquo;A practical question is which wavelet to use for a particular application. In addition to the popular but only approximately analytic Morlet wavelet, a variety of analytic wavelets have been proposed, including the Cauchy-Klauder-Morse-Paul, Derivative of Gaussian, lognormal or log Gabor, Shannon, and Bessel wavelets. However, this profusion of wavelet types serves as a barrier to acquiring the knowledge necessary to carry out practical applications. In the absence of a suitable unifying theory for wavelet behaviors, the choice of a particular wavelet for a particular problem may even appear arbitrary. As attempts to address this, one may find in the literature very many examples of papers&mdash;frequently with overlapping content&mdash;in which different types of wavelets are applied to the same signal, in order to decide which wavelet is &lsquo;better&rsquo; in some sense. The large effort spent on such case-by-case analyses underscores the need for a systematic and unified framework for understanding analytic wavelets and their properties.&rdquo;  .cite[Lilly and Olhede (2012b)]
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Which Wavelet to Use?
+
+In .cite[Lilly and Olhede (2009a, 2012b)], we showed the following:
+
+1.  All known analytic wavelet types can be subsumed into one much broader family.
+2.  Within that family, one can objectively say which choice is the  &lsquo;best&rsquo; for general use.
+
+
+The name of this broad  &lsquo;superfamily&rsquo; of wavelets is the *generalized Morse wavelets.*
+
+
+The recommended choice within this wavelet family is that which maximizes frequency-domain symmetry.
+
+
+The generalized Morse wavelets have a simple Fourier-domain form
+
+`\[\Psi_{\beta,\gamma}(\omega) = a_{\beta,\gamma} \,\omega^\beta e^{-\omega^\gamma}\]`
+
+for `$\omega>0$`, with `$\Psi_{\beta,\gamma}(\omega)=0$` elsewhere.  Here `$a_{\beta,\gamma} $` is a normalization.
+
+<!-- One stumbling block used to be determining which wavelet to use.  This was addressed in .cite[Lilly and Olhede (2009, 2012b)].  From the latter paper:-->
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Examples of Wavelets
+<center><img style="width:60%"  src="../../figures/morsie_families_new.png"></center>
+
+The generalized Morse wavelets in the time domain.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Examples of Wavelets
+<center><img style="width:60%"  src="../../figures/morsie_families_fourier.png"></center>
+
+The generalized Morse wavelets in the frequency domain.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Concentration
+<center><img style="width:60%"  src="../../figures/analytic-morsephase-ai.png"></center>
+
+The time-frequency concentration (Heisenberg area) is maximized near `$\gamma=3$`, where the wavelets are also symmetric in frequency.
+
+.cite[Lilly and Olhede (2012)]
+<!--Furthermore, considered as a time series, `$w(t,s)$` will have no energy at negative frequencies.  -->
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Important Parameters
+
+It can be readily shown that the generalized Morse wavelet
+
+`\[\Psi_{\beta,\gamma}(\omega) = a_{\beta,\gamma} \omega^\beta e^{-\omega^\gamma}\]`
+
+has a peak in the frequency domain at frequency `$\omega_{\beta,\gamma}\equiv(\beta/\gamma)^{1/\gamma}$`.
+
+Scale can therefore be converted to frequency by `$\omega=s/\omega_{\beta,\gamma}$`.
+
+The *half-width* of this peak, as a fraction of its location `$\omega_{\beta,\gamma}$`, is roughly `$1/P_{\beta,\gamma}$` where `$P_{\beta,\gamma}\equiv\sqrt{\beta\gamma}$`.
+
+Frequency-domain symmetry, time-frequency concentration, and similarity to a Gaussian are all maximized near `$\gamma=3$`.  This means that the only parameter that needs to be adjusted is `$\beta$`.
+
+Increasing `$\beta$` has the effect of increasing the number of oscillations in the time domain, or *decreasing* the bandwidth, thus making the wavelet narrower in the frequency domain.
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Narrowband Filtering
+
+The wavelet transform can be used to isolate localized bands of variability, such as those due to tides or internal waves.
+
+To do this, we note that the wavelet transform at a particular scale `$s_o$`, or equivalently a particular frequency `$\omega_o=s_o/\omega_{\beta,\gamma}$`, is simply a *one-sided* (or analytic) bandpass in the vicinity of frequency  `$\omega_o$`.
+
+Thus the real part of the wavelet transform at a particular frequency
+`\[\hat x(t) = \Re\left\{w(t,s_o)\right\}\]`
+is a bandpassed version of the signal at frequency  `$\omega_o$`.  Increasing `$\beta$` makes this bandpass more narrow in the frequency domain.
+
+To remove an isolated peak, (i) take the wavelet transform for only *one* choice of frequency, then (ii) take the spectrum of the residual `$x(t)-\hat x(t)$`.  Adjust the choice of `$\beta$` such that the spectrum of the residual shows that the peak has been effectively removed.
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Implementation
+
+Wavelet analysis using generalized Morse wavelets is implemented in my toolbox, [{jLab}](http://www.jmlilly.net/jmlsoft.html), available at [{www.jmlilly.net}](http://www.jmlilly.net).
+
+They are also now the default wavelets used in Matlab's continuous wavelet transform routine in their wavelet toolbox.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Another Example
+
+<center><img style="width:100%"  src="../../figures/bravotransform.png"></center>
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Always Say Which Wavelet
+
+The wavelet transform is a great way to visualize your data, &ldquo;unwrapping&rdquo; the variability at different scales.
+
+However, it is essential to keep in mind that all time series methods represent an *interaction* between your signal and the analyzing method.
+
+In wavelet analysis, the wavelet transform is the result of *smoothing* the signal with the wavelet.  It is not a property of the signal!  It is an *interaction* between the signal and the wavelet.
+
+Therefore, whenever you show a wavelet transform, you *must* also (i) show the time series that you started with, and (ii) say exactly which wavelet you are using.
+
+In a paper, it is a good idea to actually show the wavelet you are using in both time and frequency.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Understanding Artifacts
+
+You should also always take the wavelet transform of a delta function and a sinusoid with your wavelet of choice for time series of the same length as your data.
+
+This helps you to understand what structure is due to the signal and what is due to the wavelet.
+
+To understand what the wavelet transform of noise looks like, take the wavelet transform of your data, but with the time order randomly reshuffled using <tt>randperm</tt>.  Any structure you see here is due entirely to the wavelet!  Compare this with the transform of the original data to check what is signal and what is artifact.
+
+A wavelet is like a *lens* through which we view the variability in both time *and* frequency.  All lenses will distort in some way, but you can't *not* choose a lens!
+
+Therefore, you have to understand the nature of the artifacts introduced by the lens.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Summary, Part I
+
+(i) The sampling model
+
+`\[  z_n \equiv z(\Delta n),\quad\quad n=0,1,\ldots,N-1  \]`
+
+(ii) Euler's formula
+
+`\[  e^{i\omega t} = \cos(\omega t) + i \sin(\omega t)  \]`
+
+
+(iii) The discrete Fourier transform
+
+`\[z_n=\frac{1}{N}\sum_{m=0}^{N-1} Z_m e^{i2\pi nm/N},\quad\quad\quad  Z_m \equiv  \sum_{n=0}^{N-1}z_n e^{-i2\pi nm /N} \]`
+
+(iv) The continuous Fourier transform
+
+`\begin{equation}
+  z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} Z(\omega)\, e^{i\omega t} d\omega,\quad\quad Z(\omega)\equiv  \int_{-\infty}^{\infty} z(t)\, e^{-i\omega t}  d t
+\end{equation}`
+
+*Note (iii) becomes (iv) as a limit; (iv) gives the reflection formula*
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Summary, Part II
+
+(v) The wavelet transform
+
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
+
+*The right hand side of (v) follows from reflection formula; then (v) gives wavelet transform of delta and sinusoid*
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Important Extensions
+
+Wavelet analysis is great for visualizing the variability contained in your time series.
+
+By itself, however, it is more a visualization tool than a quantitative analysis.
+
+It is possible to go further with very powerful analysis methods that use wavelet analysis as their foundation:
+
+&bull;  *Wavelet ridge analysis* is a technique for extracting the properties of amplitude and-frequency modulated oscillations from noisy signals.  .cite[Lilly and Olhede (2009b, 2010, 2012a)]
+
+&bull;  *Element analysis* is a method for analyzing *impulsive* or *time-localized* features which themselves resemble wavelets, including significance testing. .cite[Lilly (2017)]
+
+These have in common that they add to the wavelet analysis a *conceptual model* for what that signal is like.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Element Analysis
+
+<center><img style="width:95%"  src="../figures/impulses-morsetrain-whitenoisy.jpg"></center>
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Element Analysis
+
+<center><img style="width:95%"  src="../figures/impulses-morsetrain-rednoisy.jpg"></center>
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Element Analysis
+
+<center><img style="width:95%"  src="../figures/impulses-labseathreepanel.jpg"></center>
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Example of Ridge Analysis
+<img style="width:90%"  src="../../figures/bandwidth_example.png">
+
+The <i>ridge</i> is the curve made by tracing out the maximum modulus of the wavelet transform.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Example of Ridge Analysis
+<img style="width:100%"  src="../../figures/bandwidth_looper.png">
+
+The transform value along this curve is an estimate of the oscillatory signal component, visualized as ellipses.
+
+Ridge analysis separates modulated elliptical signal from low-frequency meandering and higher-frequency variability.
+
+<!--Use `\(\mathtt{wavetrans}\)` and `\(\mathtt{ridgewalk}\)` from jLab at [{www.jmlilly.net}](http://www.jmlilly.net). -->
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Application to the Global Drifter Dataset
+
+<img style="width:100%"  src="../../figures/highresspaghetti.png">
+
+Apply the wavelet ridge analysis method to 20K time series.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Vortex Detection
+
+<img style="width:90%"  src="../../figures/alleddies.png">
+Red = positive rotation, blue = negative rotation.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Statistical Significance
+
+<img style="width:90%"  src="../../figures/significanteddies.png">
+After comparison with a null hypothesis of red noise.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+#Ridge Analysis Details
+
+*  The notion of the *analytic signal* lets an *instantaneous* amplitude and frequency be associated with a given time series.
+.cite[Gabor (1946), Vakman and Vainshtein (1977), Picinbono (1997)]
+
+
+*  Similarly, a bivariate (x,y) signal defines the geometrical properties of a time-varying ellipse.
+.cite[Lilly and Olhede (2010a)]
+
+
+*  This may be extended to 3D (e.g. seismographs) or N-D signals.  .cite[Lilly (2011), Lilly and Olhede (2012a)]
+
+
+*  Modulated oscillations can be extracted using *wavelet ridge analysis*, a local best fit onto an oscillatory test function. .cite[Delprat et al. (1992), Mallat (1999), Lilly and Olhede (2010b)]
+
+
+*  Modulated multivariate oscillations can be treated similarly.
+.cite[Lilly and Olhede (2012a)]
+
+
+*  Errors are proportional to modulation strength, and are minimized by a suitable choice of wavelet.
+.cite[Lilly and Olhede (2010b), Lilly and Olhede (2012a)]
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+            <!--Browser-specific hack for Safari tilde bug -->
+    <!--thanks to dpvc at https://github.com/mathjax/MathJax/issues/1737-->
+        if (MathJax.Hub.Browser.isSafari && parseInt(MathJax.Hub.Browser.webkit) >= 603) {
+  MathJax.Hub.Register.StartupHook("HTML-CSS Jax Ready", function () {
+    var HTMLCSS = MathJax.OutputJax["HTML-CSS"];
+    var MML = MathJax.ElementJax.mml;
+    var toHTML = MML.mo.prototype.toHTML;
+    MML.mo.Augment({
+      toHTML: function (span) {
+        span = toHTML.call(this,span);
+        if (span.bbox.w === 0 && span.bbox.lw < 0 && span.firstChild) {
+          span.style.marginLeft = HTMLCSS.Em(span.bbox.lw);
+        }
+        return span;
+      }
+    });
+  });
+}
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>

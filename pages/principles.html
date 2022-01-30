@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.principle {font-family: Georgia;font-size: 1.3em;color: #606060;font-weight: bold;letter-spacing:0.05em;}
+.anti{font-family: Georgia;font-size: 1.3em;color: maroon;font-weight: bold;letter-spacing:0.05em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+name: thetimedomain
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[Principles of Data Analysis, and Anti-Principles]
+
+
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+Idea of principles and anti-principles taken from
+
+<i>Changing the Conversation: The 17 Principles of Conflict Resolution</i> by Dana Caspersen
+
+
+<!--1.  When you first get a dataset, *look at the data* by making simple plots, zooming in, exploring it with your imagination.
+1.  Get to know the data quantitively through its statistics.  If the data is velocity data, this means the variance ellipse.
+1.  Creative use of <tt>twodhist</tt> and <tt>twodstats</tt> can tall you a huge amount, especially for large multivariate datasets.
+1.  Simple smoothing, using <tt>vfilt</tt> for example, can isolate different time scales and can be combined with statistics.
+1.  After very thoroughly exploring these *low-tech* methods, take the Fourier spectra using the multi-taper method or some other suitable method.  If the data is velocity data, look at both the rotary spectra, and the `$(x,y)$` spectra in a suitable rotation.
+1.  For data having multiple scales, examine the time varying varaibility through the use of the wavelet transform.
+1.  If bands of variability appear, the wavelet transform can be used to bandpass the time series and extract a band of interest.
+1.  Although we did not get this far, a next step is creating simple model time series for comparison, and/or finding ways to objectively quantify whatever one is seeing.-->
+<!-- creating a stochastic model, combining with information from other data sources, many other possibilities... -->
+
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Get to know the data on its own terms, as you would get to know a person]
+
+--
+
+.anti[Anti-principle: Approach the data with expectations, hoping it will be what you want it to be]
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Keep your eyes sharp.  Be on the lookout for unexpected patterns, mysteries, and problems]
+
+--
+
+.anti[Anti-principle: Single-mindedly focus on one aspect of the data and ignore all others]
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Examine the data with the simplest possible methods at first, and gradually add complexity as needed]
+
+--
+
+.anti[Anti-principle: Begin by applying a fancy method you don't really understand using code that somebody else wrote]
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Keep your mind open to alternate interpretations and other possible explanations ]
+
+--
+
+.anti[Anti-principle: Unconsciously assume that the first idea that came to you must be the right one]
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Try to hold multiple points of view simultaneously]
+
+--
+
+.anti[Anti-principle: Be content with the default view, the one you currently hold]
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Find a way to look at the data in such a way that it &ldquo;collapses&rdquo; or simplifies, revealing structure]
+
+--
+
+.anti[Anti-principle: Look at the data in such a way that it becomes less compact or more complicated, obscuring structure]
+
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Follow your hunches, intuition, and curiosity tenaciously until you reach a definitive conclusion]
+
+--
+
+.anti[Anti-principle: Abandon hunches at the first sign of discouragement or difficulty.  Be paralyzed by &ldquo;black hat&rdquo; thinking]
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: As evidence accumulates for a particular hypothesis, try to critique it more strongly, looking for holes]
+
+--
+
+.anti[Anti-principle: Let your favorite hypothesis get an &ldquo;easy pass&rdquo;.  View the evidence in best possible light ]
+
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: As the story solidifies, honestly assess the limits of what can be proven, what is suggested, and what is not clear]
+
+--
+
+.anti[Anti-principle: Overreach your conclusions, and feel the wrath of the reviewers.  Understate, and lose impact ]
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Learn to see the natural silhouette of a unit of scientific progress]
+
+--
+
+.anti[Anti-principle: Try to say too much, or too little, without telling a story ]
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Come to terms with the fact that all units of scientific progress leave unanswered questions]
+
+--
+
+.anti[Anti-principle: Strive to answer all possible questions, and therefore never finish anything ]
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+.principle[Principle: Tell the easy or &ldquo;low-hanging fruit&rdquo; story first, and then build on it]
+
+--
+
+.anti[Anti-principle: Get lost in possibilities, or obsessed with the difficult stories  ]
+
+
+
+---
+class: left,top .toc[[&#10023;](../index.html)]
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+&nbsp;
+
+&nbsp;
+
+.principle[Skillful qualities: Objective, impartial, open, cautious, creative, nimble, fluid, determined, prudent, meticulous]
+
+<!--.anti[Unskillful qualities: Entangled, biased, closedminded, overeager, mechanical, stagnant, rigid, tentative, hasty, lax]-->
+
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+            <!--Browser-specific hack for Safari tilde bug -->
+    <!--thanks to dpvc at https://github.com/mathjax/MathJax/issues/1737-->
+        if (MathJax.Hub.Browser.isSafari && parseInt(MathJax.Hub.Browser.webkit) >= 603) {
+  MathJax.Hub.Register.StartupHook("HTML-CSS Jax Ready", function () {
+    var HTMLCSS = MathJax.OutputJax["HTML-CSS"];
+    var MML = MathJax.ElementJax.mml;
+    var toHTML = MML.mo.prototype.toHTML;
+    MML.mo.Augment({
+      toHTML: function (span) {
+        span = toHTML.call(this,span);
+        if (span.bbox.w === 0 && span.bbox.lw < 0 && span.firstChild) {
+          span.style.marginLeft = HTMLCSS.Em(span.bbox.lw);
+        }
+        return span;
+      }
+    });
+  });
+}
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>

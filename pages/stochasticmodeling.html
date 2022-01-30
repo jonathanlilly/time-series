@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+name: stochasticmodeling
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[Stochastic Modeling]
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Ocean Turbulence
+
+<video preload="auto" width="60%" height="auto"  data-setup="{}" autoplay loop controls><source src="../../videos/turbulencemovie.mp4" type="video/mp4" /></video>
+
+An idealized model of oceanic turbulence by Jeffrey Early.
+Shading is speed with particle trajectories shown in color.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+
+#Modeling Trajectories
+
+<video  style="margin-top:-0.5em;" preload="auto" width="100%" height="auto" data-setup="{}" autoplay loop controls><source src="../../videos/dispersionmovie.mp4" type="video/mp4" /></video>
+
+<!-- One of these is 2D turbulence, one is a 3-parameter stochastic model.-->
+
+A simple stochastic model for trajectories in oceanic turbulence is the *Mat&eacute;rn process* or <i>damped</i> Fractional Brownian motion.
+
+This three-parameter model lets us match (i) the kinetic energy, (ii) the dispersion, and (iii) the degree of small-scale roughness.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Mat&eacute;rn Process
+
+A relatively little-known random process called the Mat&eacute;rn process .cite[(Mat&eacute;rn, 1960)] has a spectrum given by
+`\[S_{zz}(\omega) = \frac{A^2}{(\omega^2+\lambda^2)^\alpha}\]`
+where `$A$` sets the energy level, `$\alpha$` sets the high-frequency slope, and `$\lambda$` determines a low-frequency transition to a constant spectral value.
+
+--
+Recently, we investigated this process in detail, and showed that it is an excellent model for trajectories in ocean turbulence.  We speculate it will prove suitable for many other processes as well.
+
+We showed the Mat&eacute;rn process is a generalization of *fractional Brownian motion* .cite[(Mandelbrot and Van Ness, 1968)] to include a damping term, `$\lambda$`, that is the essential ingredient for modeling dispersion.
+
+.cite[Lilly, Sykulski, Early, and Olhede (2017). Fractional Brownian motion, the Mat&eacute;rn process, and stochastic modeling of turbulent dispersion.  <a href="./papers/lilly17-npg.pdf"><nobr>[3.2 Mb pdf]</nobr> </a>]
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+## An Hierarchy of Stochastic Models
+
+The following stochastic differential equations (SDEs) should more formally be written as the stochastic *integral* equations.  Note that `\(z(t)=u(t)+iv(t)\)` represents a complex-valued <i>velocity</i>.
+
+Brownian motion:
+
+`\[\frac{dz}{d t}  = A\,\frac{d w}{d t} \quad\longrightarrow\quad S_{zz}(\omega) = \frac{A^2}{\omega^2}\]`
+
+Fractional Brownian motion (fBm):
+
+`\[\frac{d^\alpha z}{d t^\alpha}  = A\,\frac{d w}{d t} \quad\longrightarrow\quad S_{zz}(\omega) = \frac{A^2}{\omega^{2\alpha}}\]`
+
+Damped Fractional Brownian motion a.k.a. the Mat&eacute;rn process:
+
+`\[\left[\frac{d}{d t} + \lambda \right]^\alpha z = A\,\frac{d w}{d t} \quad\longrightarrow\quad S_{zz}(\omega) = \frac{A^2}{(\omega^2+\lambda^2)^\alpha}\]`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+## Another Hierarchy of Stochastic Models
+
+Damped Brownian motion <i>a.k.a.</i> Ornstein-Uhlenbeck (OU) process:
+`\[\frac{dz}{d t} + \lambda z = A\,\frac{d w}{d t} \label{maternsde}\quad\longrightarrow\quad S_{zz}(\omega) = \frac{A^2}{\omega^2+\lambda^2}\]`
+
+Damped Brownian motion + spin <i>a.k.a.</i> complex OU (cOU) process:
+`\[\frac{dz}{d t} - i\Omega z+ \lambda z = A\,\frac{d w}{d t} \quad\longrightarrow\quad S_{zz}(\omega) = \frac{A^2}{(\omega-\Omega)^2+\lambda^2}\]`
+
+Damped fBm + spin <i>a.k.a.</i> Mat&eacute;rn + spin <i>a.k.a.</i> fractional cOU:
+`\[\left[\frac{d}{d t} - i\Omega+ \lambda \right]^\alpha z = A\,\frac{d w}{d t} \quad\longrightarrow\quad S_{zz}(\omega) = \frac{A^2}{[(\omega-\Omega)^2+\lambda^2]^\alpha}\]`
+
+<!--Note spin is a deterministic effect!-->
+
+<!--`\[z(t) = e^{i\Omega t} \tilde z(t)\longrightarrow R_{z z}=
+e^{i\Omega \tau} R_{\tilde z\tilde z}(\tau) \longrightarrow S_{zz}(\omega)=S_{\tilde z\tilde z}(\omega-\Omega) \]`-->
+
+Mat&eacute;rn + spin generalizes cOU to fractional orders, thus unifying OU+cOU+fBm into a single larger family.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Slope and Roughness
+
+<img style="width:100%;margin-top:-0.2em;margin-bottom:-0.2em"  src="../../figures/fbmroughness.png">
+
+The `$\alpha$` parameter sets the slope in fractional Brownian motion, or at high frequencies in the Mat&eacute;rn process, as `$S(\omega)\sim \omega^{-2\alpha}$`.
+
+It also sets the degree of small-scale roughness in the trajectories.
+In the above, we go from slopes of `$\omega^{-3}$` at left to `$\omega^{-1}$` at right.
+
+Steeper spectral slope = more smooth.
+
+Spectral slope can be formally linked to a mathematical measure of roughness called the *fractal dimension*, though in my opinion, fractal dimension seems to have little practical value.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Slope and Self-Similarity
+
+<img style="width:85%;margin-top:-0.2em;margin-bottom:-0.2em"  src="../../figures/fbmselfsimilarity.png">
+
+The `$\alpha$` parameter also sets *aspect ratio* of statistical self-similarity.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+##Diffusivity is the Spectrum's Value at Zero
+
+The velocity autocovariance and spectrum are defined as
+
+`\[R_{zz} (\tau)\equiv\left\langle z(t+\tau)\,z^*(t)\right\rangle = \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega \tau} S_{zz}(\omega) \, d\omega\]`
+
+The corresponding diffusivity is given by
+`\[\kappa \equiv \lim_{t\longrightarrow\infty}
+ \frac{1}{4} \frac{d}{d t} \left\langle x^2(t) + y^2(t)\right\rangle
+ =\frac{1}{4} \int_{-\infty}^\infty R_{zz}(\tau)\, d \tau =\frac{1}{4}S_{zz}(0)\]`
+
+with the last equality following from `\(\int_{-\infty}^\infty e^{-i \omega \tau} R_{zz}(\tau) \, d\tau=  S_{zz}(\omega)\)`.
+
+Mat&eacute;rn:  `\( \,\,\,\,S_{zz}(\omega) = \frac{A^2}{(\omega^2+\lambda^2)^\alpha} \quad\longrightarrow\quad \kappa =  \frac{1}{4}\frac{A^2}{\lambda^{2\alpha}}\)`
+
+fBm: `\( \quad\quad S_{zz}(\omega)= \frac{A^2}{\omega^{2\alpha}} \quad\quad\,\,\longrightarrow\quad \kappa =  \infty\)`
+
+Infinity means the diffusivity increases without bound.  Thus the Mat&eacute;rn, unlike fBm, can model diffusive processes.
+
+---
+class: left
+##Another Take on Diffusivity
+
+Most simply, the absolute diffusivity can be understood as a fundamental second-order statistical property of the Lagrangian velocity.
+
+The diffusivity is the twin of the variance.
+
+`\[\sigma^2  =\frac{1}{2\pi} \int_{-\infty}^\infty S_{zz}(\tau)\, d \tau =R_{zz}(0)\]`
+`\[\kappa  =\frac{1}{4} \int_{-\infty}^\infty R_{zz}(\tau)\, d \tau =\frac{1}{4}S_{zz}(0)\]`
+
+Thus diffusivity is a basic second-order property of any time series.
+
+The zero frequency value of the spectrum of a process describes how the temporal integral of the process spreads out over time.
+
+You don't have to think that diffusion is a good physical model in order to usefully quantify a process using `$\kappa$` as one of the parameters.
+
+
+---
+class: left
+##The Damping Time Scale
+
+The `$\lambda$` parameter sets the frequency, or timescale `$2\pi/\lambda$`, at which the Mat&eacute;rn process transitions from behaving like fractional Brownian motion to behaving like white noise:
+
+`\[S_{zz}(\omega) = \frac{A^2}{(\omega^2+\lambda^2)^\alpha}.\]`
+
+`\[S_{zz}(\omega) \approx \frac{A^2}{\omega^{2\alpha}},\quad\quad\quad \omega\gg \lambda\]`
+`\[S_{zz}(\omega) \approx \frac{A^2}{\lambda^{2\alpha}},\quad\quad\quad \omega\ll \lambda\]`
+
+
+If you zoom in to the velocity process, you see fBm.
+If you zoom out, you see white noise (and thus finite diffusivity).
+
+Note that `$2\pi/\lambda$` is not the same as the Lagrangian integral timescale.
+        
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Summary of Parameters
+
+Returning the Mat&eacute;rn SDE and spectrum
+
+`\[\left[\frac{d}{d t} + \lambda \right]^\alpha z = A\,\frac{d w}{d t} \quad\longrightarrow\quad S_{zz}(\omega) = \frac{A^2}{(\omega^2+\lambda^2)^\alpha}\]`
+
+we find the following interpretation of parameters:
+
+1.  `$A$` sets the process amplitude.
+2.  `$\alpha$`, the order of the SDE, sets the spectral slope, fractal dimension, and self-similarity aspect ratio at small scales.
+3.  `$\lambda$`, which appears as a damping in the SDE, sets the low-frequency transition to a white spectrum, and also controls the diffusivity together with `$A$`.
+
+Keep in mind that the SDE is written only for notational convenience; formally, one should write the corresponding stochastic integral equation, as discussed in Lilly et al. (2017).
+
+
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Comparison of Models
+
+<img style="width:60%;margin-top:-0.2em;margin-bottom:-0.2em"  src="../../figures/randomwalk_dispersion.png">
+
+Top left: numerical simulations.  Top right: Mat&eacute;rn process.
+Bottom left: white noise.  Bottom right: red noise (Brownian).
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Argument for Generality
+
+We conjecture that the Mat&eacute;rn may be of general usefulness:
+
+&ldquo;Systems are often characterized by a pressure to grow&mdash;represented by a forcing&mdash;together with some drag or resistance on that growth, represented by a damping. After a sufficiently long time, the forcing and the damping equilibrate and one reaches a bounded state. This leads to the speculation that many time series that are well described as fBm over relatively short timescales may be better matched by the Mat&eacute;rn process over longer timescales. More generally, the Mat&eacute;rn process adds a third parameter (damping) to the two parameters (amplitude together with spectral slope or the Hurst parameter) of fBm, thus permitting a wider range of spectral forms to be accommodated. It is therefore reasonable to think that the Matérn process could be of broad interest in many areas in which fBm has already proven itself useful.&rdquo;
+
+.cite[Lilly, Sykulski, Early, and Olhede (2017)]
+
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Global Surface Drifter Dataset
+
+<video preload="auto" width="100%" height="auto"  data-setup="{}" autoplay loop controls><source src="../../videos/driftermovie.mp4" type="video/mp4" /></video>
+
+Now we will apply the Mat&eacute;rn process to the global drifter dataset.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Spectra of Drifter Velocities
+
+<img style="width:45%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../../figures/highreslatitudespectra.png">
+
+We see a low-frequency maximium and tidal maxima&mdash;all vertical lines&mdash;and a maximum along a curving line, the inertial frequency.
+
+<!--Inertial frequency becomes the vertical line `\(\omega/f_o=1\)`.  Tides become curved.  Note roughly universal appearance in new coordinates.-->
+
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##A Conceptual Model for the Spectrum
+
+<img style="width:65%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../../figures/schematictransparency2.png">
+
+\begin{equation}
+S(\omega) = \overset{\mathrm{background}}{\overbrace{\frac{A_b^2}{\left[\omega^2+\lambda_b^2\right]^\alpha}}}
++\overset{\mathrm{inertial\,\, oscillations}}{\overbrace{\frac{A_o^2}{\left(\omega-f_o\right)^2+\lambda_o^2}}}+
+\overset{\mathrm{semidiurnal\,\,tide}}{\overbrace{\frac{A_s^2}{\left(\omega-f_s\right)^2+\lambda_s^2}}}
+\end{equation}
+
+This is just several versions of the Mat&eacute;rn spectrum added together.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+## Details of the Stochastic Modeling
+
+We have developed a method for stochastic modeling of trajectories in ocean turbulence, and inferring parameters from large datasets.
+
+This is an example of *parametric spectral analysis*:  rather than trying to estimate the spectrum directly, one begins with a *conceptual model*, controlled by some parameters, and then finds the choice of parameters which provide the best match to the data.
+
+The full method consists of several ingredients:
+
+*  Create an appropriate stochastic model for particle trajectories.
+.cite[Sykulski, Olhede, Lilly, and Danioux (2015)]
+* Employ the  Mat&eacute;rn  process as a building block.  .cite[Lilly, Sykulski, Early, and Olhede (2017)]
+* Parameter estimation is best done in the frequency domain.
+.cite[Whittle (1953)]
+* Parameter estimation must be adjusted to handle *complex-valued* time series. .cite[Sykulski, Olhede, Lilly, and Early (2017)]
+* Parameter estimation must be corrected for subtle bias due to small sample size effects.  .cite[Sykulski, Olhede, Guillaumin, Lilly, and Early (2019)]
+
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+### Spectra in Latitude Bands
+<img style="width:75%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../../figures/drifterspectralinestransparency.png">
+
+Averages in `\(\pm 5 ^\circ \)` bins.  Frequency is nondimensionalized as `\(\omega/f_o\)`.
+Inertial peak broadens equatorward.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+### Comparison with Spectral Fit
+
+<img style="width:75%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../../figures/drifterspectralinestransparencywithfullfit.png">
+
+In general, spectral model compares very well with estimated spectra.  Inertial and semidiurnal peaks are well captured.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+### Fit to Background vs. Cyclonic Side
+
+<img style="width:75%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../../figures/drifterspectralinestransparencycyclonicwithfit.png">
+
+&ldquo;Background&rdquo; fit to anticyclonic (inertial side), matches well the spectrum on the cyclonic (anti-inertial) side, apart from tides.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##Application to the Global Drifter Dataset
+
+<img style="width:100%;margin-top:-0.2em;margin-bottom:-0.2em"  src="../../figures/globalantiinertiallambda.png">
+
+The nondimensionalized damping parameter from a parametric fit to the Mat&eacute;rn, only on the anti-inertial side.
+
+Shorter &lsquo;memory&rsquo; in more energetic regions.
+We are not aware of any theory for this.
+---
+class: center, .toc[[&#10023;](../index.html)]
+##Application to the Global Drifter Dataset
+
+<img style="width:100%;margin-top:-0.2em;margin-bottom:-0.2em"  src="../../figures/globalantiinertialalpha.png">
+
+The first global map of the slope parameter `\(\alpha\)`, with `\(|\omega|^{-2\alpha}\)`.
+Slopes vary from `\(|\omega|^{-1}\)` to `\(|\omega|^{-3}\)`, with `\(|\omega|^{-2}\)` over major currents.
+
+Does not fit the conventional wisdom of only `\(|\omega|^{-2n}\)` slopes,
+as in e.g. .cite[Berloff and McWilliams (2002b)]
+
+
+
+<!--Lagrangian integral timescale: `\[T \equiv  \frac{1}{2}\frac{\int_{-\infty}^\infty R_{zz}(\tau) \,d \tau}{R_{zz}(0)} = \frac{1}{2}\frac{S_{zz}(0)}{\frac{1}{2\pi} \int_{-\infty}^\infty S_{zz}(\omega) \,d \omega} =\frac{2\kappa}{\sigma^2}\]`-->
+
+<!--Spectral slope / fractal dimension:
+`\[R_{zz}(\tau) \sim |\tau|^{2\alpha-1}, \quad\tau \approx 0 \quad \longleftrightarrow\quad S_{zz}(\omega) \sim |\omega|^{-2\alpha},\quad  \omega\gg 0\]`-->
+
+<!--which holds for $1/2<\alpha<3/2$; see \citet{goff88-jgr},-->
+<!-- $\sigma^2 =c_\alpha A^2/\lambda^{2\alpha-1}$ and $\kappa = \frac{1}{4}A^2/(\Omega^2+\lambda^2)^\alpha$, where $c_\alpha\equiv\Gamma\left(\alpha-\frac{1}{2}\right)/\Gamma(\alpha)/(2\sqrt{\pi})$ with $\Gamma(\cdot)$  being the gamma function, see \citet{lilly16-itit}, while the Lagrangian integral timescale is just~$T=2\kappa/\sigma^2$.  -->
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Summary
+
+The  Mat&eacute;rn process is the simplest random process that can simultaneously reproduce (i) the velocity variance (ii) the diffusivity and (iii) the spectral slope or degree of small-scale roughness.
+
+--
+
+This is a promising stochastic model for Lagrangian trajectories, where it is useful for parameteric spectral modeling, as a model for synthetic trajectories, as a null hypothesis in eddy studies.
+
+--
+
+The  Mat&eacute;rn process is conjectured to be of broad applicability.
+
+
+--
+The paper describing the  Mat&eacute;rn process is intended to serve as an accessible introduction to stochastic processes in general.
+
+.cite[Lilly, Sykulski, Early, and Olhede (2017). Fractional Brownian motion, the Mat&eacute;rn process, and stochastic modeling of turbulent dispersion.  <a href="./papers/lilly17-npg.pdf"><nobr>[3.2 Mb pdf]</nobr> </a>]
+--
+
+Code can be found in [{jLab}](http://www.jmlilly.net/jmlsoft.html).
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+            <!--Browser-specific hack for Safari tilde bug -->
+    <!--thanks to dpvc at https://github.com/mathjax/MathJax/issues/1737-->
+        if (MathJax.Hub.Browser.isSafari && parseInt(MathJax.Hub.Browser.webkit) >= 603) {
+  MathJax.Hub.Register.StartupHook("HTML-CSS Jax Ready", function () {
+    var HTMLCSS = MathJax.OutputJax["HTML-CSS"];
+    var MML = MathJax.ElementJax.mml;
+    var toHTML = MML.mo.prototype.toHTML;
+    MML.mo.Augment({
+      toHTML: function (span) {
+        span = toHTML.call(this,span);
+        if (span.bbox.w === 0 && span.bbox.lw < 0 && span.firstChild) {
+          span.style.marginLeft = HTMLCSS.Em(span.bbox.lw);
+        }
+        return span;
+      }
+    });
+  });
+}
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>

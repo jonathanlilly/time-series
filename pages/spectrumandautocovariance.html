@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+name: spectralanalysis
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[Spectrum and Autocovariance]
+
+
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Three Important Points
+
+1.  For any dataset you analyze, you should know the sample interval `$\Delta$`, number of points `$N$`, and duration `$T=N\Delta$` in physical meaningful units that you can relate to.
+2.  From these, you should know the Rayleigh frequency `$f^{\cal{R}}=1/T$` and the Nyquist frequency `$f^{\cal{N}}=1/(2\Delta)$`.
+3.  Be aware that there are two conventions for frequency, radian `$\omega$` and cyclic `$f$`, and note with care which you are using.  Recall  `$\omega=2\pi f$`, as can be seen from `$\cos(\omega t)$` and `$\cos(2\pi f t)$`.
+
+
+<!-- class: center, .toc[[&#10023;](../index.html)]
+#An Outstanding Mystery
+
+<img style="width:90%"  src="../figures/realdftodd.png">
+
+The DFT of `$\cos (2\pi f n)$` with `$N=101$` is distributed.  Why?-->
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Basic Idea
+
+The basic idea of spectral analysis is to break apart the variability of a time series into contributions from different frequencies.
+
+Genereally, this is done in the context of the assumption that the time series is a sample of some type of stochastic process.  Thus, we need to review ideas such as the autocovariance function.
+
+As will be seen, the  autocovariance function and the spectrum are two equivalent quantities containing the essential second-order statistical information of a stochastic signal.
+
+However, the spectrum tends to be more useful in practice, as well as easier to estimate.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#A Conceptual Model
+
+We believe that our time series `$z_n$` is a *sample* of a real-world time series `$z(t)$` that, for simplicity, we presume to go on forever.
+
+We can usefully imagine `$z(t)$` to be some type of random process.
+
+This means that, while we *happened* to observe one series of values, we could just as readily have observed another series.
+
+The abstract set of all possible times series that we *could* have observed is called the ensemble.
+
+The easiest way to understand the ensemble is with respect to repeated runs of a numerical model.
+
+Each run, or *realization*, of a numerical model (of the ocean, atmosphere, or climate) will tend to be different from the all others even if all model parameters remain unchanged.
+
+This is because of the turbulent nature of the system, generating different results from the same initial conditions.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Ensemble Averaging
+
+Thus we believe that it is useful to think of there being a random process `$z(t)$` underlying our observations `$z_n$`.
+
+In order to correctly describe the *statistical* behavior of this random process, we need a type of averaging called *ensemble averaging*, also known as the *expected value*.
+
+The expected value, or ensemble average, is denoted &ldquo;`$\mathrm{E}\{\}$`&rdquo;, and represents an average over all the time series we *might* have observed, that is, over the ensemble.
+
+The expected value or ensemble mean of `$z(t)$` is
+
+`\[\eta(t)\equiv\mathrm{E}\{z(t)\}\]`
+
+which importantly can be a function of time!  For example, in a greenhouse gas simulation, the globally averaged temperature, averged over the model ensemble, will tend to increase.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Types of Averaging
+
+It is important to understand that the ensemble average is a very different kind of average from what we may be used to.
+
+The ensemble average is, normally, not something you compute.  Rather, it is a *theoretical tool*  employed to help describe reality.
+
+This average is needed because we have *assumed*, as a conceptual model, that what we have observed is some type of random process.
+
+The more familar type of mean that we forms from observed values of a discrete-time process `$z_n$` or a continuous-time process `$z(t)$`
+
+`\[\overline z_n \equiv \frac{1}{N}\sum_{n=0}^{N-1} z_n,\quad\quad \overline{z}\equiv \frac{1}{T}\int_{-T/2}^{T/2} z(t) \mathrm{d}t\]`
+
+are called the *sample means*.  These are not functions of time!
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Autocovariance
+
+In describing the statistical behavior of the random process  `$z(t)$`, we seek to quantify not only its mean or *expected value* but also its typical spread about the mean. The *variance* is defined as
+
+`\[\sigma^2 (t)\equiv\mathrm{E}\{\left|z(t)-\eta(t)\right|^2\},\quad\quad\eta(t)\equiv\mathrm{E}\{z(t)\}\]`
+
+which gives the expected squared deviation from the mean.
+
+Again, unlike the *sample variance* of the observe time series `$z_n$`, the variance of `$z(t)$` involves an average over *realizations* and not over time.  It is not something we can normally compute directly.
+
+
+Similarly, the autocovariance function of `$z(t)$` is defined as
+
+`\[R (t,\tau)\equiv\mathrm{E}\{\left[z(t+\tau)-\eta(t+\tau)\right]\left[z(t)-\eta(t)\right]^*\}\]`
+
+The conjugation is there in case `$z(t)$` is complex-valued.  If it is real-valued, the conjugation does nothing and can be ignored.
+
+Note, importantly, that at zero time offset we have `$R (t,0)=\sigma^2(t)$`.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Stationarity
+
+The autocovariance is, in general, a function of *two* time variables:
+`\[R (t,\tau)\equiv\mathrm{E}\{\left[z(t+\tau)-\eta(t+\tau)\right]\left[z(t)-\eta(t)\right]^*\}.\]`
+<!--`\[R (t,\tau)\equiv\mathrm{E}\{z(t+\tau)\,z^*(t)\}.\]`-->
+The first, `$t$`, indicates where we are in time.  The second, `$\tau$`, is an *offset* that we use to compare what is happening now, at time `$t$`, with what will happen some time later.
+
+A crucial simplification happens if our time series is such that its expected value and autocovariance function  *do not change* with time `$t$`.
+In this case,  `$\eta\equiv\mathrm{E}\{z(t)\}$` and the autocovariance becomes
+<!--`\[R (\tau)\equiv\mathrm{E}\{z(t+\tau)\,z^*(t)\}.\]`-->
+`\[R (\tau)\equiv\mathrm{E}\{\left[z(t+\tau)-\eta\right]\left[z(t)-\eta\right]^*\}\]`
+and the process is then said to be *second-order stationary* (because the autocovariance is a second-order statistical quantity).
+
+It is common, and helpful, to *assume* stationarity even it is not strictly true.   Or, rather, we decide we will treat our time series *as if it were* a sample of a stationary process.  We do this henceforth.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Spectrum
+
+The Fourier transform of the autocovariance function, denoted `$S(\omega)$` and called the spectrum, gives the Fourier coefficients decomposing the autocovariance into contributions from different frequencies,
+`\[R (\tau) =    \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega \tau}  S(\omega) \, d\omega,\quad\quad S(\omega) \equiv  \int_{-\infty}^\infty e^{-i \omega \tau}  R(\tau) d\tau\]`
+where for the moment we take the right equation as a *definition*.
+
+
+Since the spectrum is a Fourier transform pair with the  autocovariance function, it contains equivalent information.
+
+<!--While both are essentially equivalent in that they capture the *same* second-order statistical information in different forms, the spectrum turns out to generally be far more illuminating, as well as easier to work with in practice.-->
+
+But the true autocovariance function is not observable unless we have (i) infinite time and (ii) access to an abstract set of other universes where things might have happened differently!
+
+Spectral analysis is about trying to *estimate* the &ldquo;true&rdquo; spectrum `$S(\omega)$` from  `$z_n$`, a finite sample of one realization of `$z(t)$`.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Relationship to Variance
+
+The spectrum has a fundamental relationship to the variance.
+
+For a second-order stationary process, the mean, variance, autocovariance function are all independent of global time `$t$`:
+
+`\[\eta\equiv\mathrm{E}\{z(t)\}\]`
+`\[\sigma^2 \equiv\mathrm{E}\{\left|z(t)-\eta\right|^2\}\]`
+
+`\[R (\tau)\equiv\mathrm{E}\{\left[z(t+\tau)-\eta\right]\left[z(t)-\eta\right]^*\}\]`
+
+so that `$R(0)=\sigma^2$`, the autocovariance at  zero time offset gives the variance (as we saw in the nonstationary case). But this means
+
+`\[ \sigma^2=R (0) =  \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega 0}  S(\omega) \, d\omega  =\frac{1}{2\pi}\int_{-\infty}^\infty  S(\omega) \, d\omega  \]`
+
+so that, importantly, the spectrum can be said to *partition the variance* into contributions from different frequencies.
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+# The Spectrum (Take One)
+
+The spectrum is for the moment *defined* as the Fourier transform of the autocovariance function
+
+`\[R (\tau)\equiv\mathrm{E}\{\left[z(t+\tau)-\eta\right]\left[z(t)-\eta\right]^*\}\]`
+
+`\[R (\tau) =    \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega \tau}  S(\omega) \, d\omega,\quad\quad S(\omega) \equiv  \int_{-\infty}^\infty e^{-i \omega \tau}  R(\tau) d\tau  \]`
+
+
+Note that (iv)  implies as a consequence the important formula
+
+`\[\sigma^2=\frac{1}{2\pi}\int_{-\infty}^\infty  S(\omega) \, d\omega \]`
+
+which states that the spectrum partitions the variance across frequency.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Spectral Estimates
+
+Recall from yesterday the Fourier pair relationships:
+`\[ z_n=\frac{1}{N}\sum_{m=0}^{N-1} Z_m e^{i2\pi m n/N},\quad\quad\quad  Z_m \equiv  \sum_{n=0}^{N-1}Z_n e^{-i2\pi m n/N}. \]`
+
+It can be shown (but not now) that the spectrum can be estimated simply by taking the modulus squared of the Fourier coefficients,
+`\[\widehat S_m\equiv \frac{1}{N}\left|Z_m\right|^2,\quad\quad n=0, 1, 2, \ldots,(N-1).\]`
+This quantity is known as the *periodogram*.
+
+As we shall see, the periodogram is *not* the spectrum!  It is an *estimate* of the spectrum&mdash;and generally speaking, a very poor one.
+
+It is also said to be the *naive* spectral estimate, meaning it is the spectral estimate that you get if you don't know that there is something better.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Three Problems
+
+The periodogram estimate of the spectrum suffers from three problems:
+1.  *Aliasing.*  This is due to the fact that a continuous-time process is *sampled*, `$z_n\equiv z(n\Delta)$`.
+3.  *Blurring.*  Values of the spectrum bleed out to affect other frequencies.  We will understand this in a later lecture.
+<!-- This is a consquence of *truncating* the process `$z(t)$`, only observing it over a finite time window of duration `$N\Delta$`.-->
+2.  *Variance.*  This is due to the randomness of the underlying process `$z(t)$`.
+
+The problem of aliasing one is more or less stuck with, but the other two problems can be greatly improved by a more sophisticated choice of spectral estimate.
+
+To minimize aliasing, you should make sure your experiment has an adequate sample rate!
+<!--, from `$t=0$`  to `$t=(N-1)\Delta$`.-->
+
+Blurring is a particularly difficult problem because it doesn't reduce with averaging.  This problem is also called *bias* or *leakage*.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Aliasing
+
+<!--Any spectral estimate is distorted from `$S(\omega)$` in two important ways.  The first is through *aliasing*.-->
+
+Imagine that our time series extends at discrete times into the infinite past and future, that is, we have `$z_n=z(n\Delta)$` for *all* positive and negative integers `$n$`, but not in between those times.
+
+In this case, it turns out that the spectrum can still be considered a function of continuous frequency `$\omega$`, but *only* up to the Nyquist at `$\omega=\pm \pi/\Delta$`.  (Recall that `$f=1/(2\Delta)$` is the same as `$\omega= \pi/\Delta$`.)
+
+It can be shown (but not right now) that the spectrum then becomes
+`\[\sum_{p=-\infty}^{\infty }S\left(\omega + p \frac{2\pi }{\Delta} \right)
+\equiv  S^{\Delta}(\omega)\]`
+which states that all frequencies higher or lower than `$\omega=\pm \pi/\Delta$` are *wrapped around* to the next resolved frequency.
+
+<!--The *aliased spectrum*  `$ S^{\Delta}(\omega)$` is the best you can hope for from finitely sample data, even if you are very patient.-->
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Aliasing Illustration
+
+<center><img style="width:45%"  src="../../figures/univariatealiasing.png"></center>
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Variance Illustration
+
+<img style="width:100%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../../figures/bettyperiodogram.png">
+
+The main problem here is variance of the periodogram spectral estimate.
+Most meaningful structure in the spectrum is obscured.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Reducing Variance
+
+<img style="width:100%;margin-top:-0.7em;margin-bottom:-0.8em"  src="../../figures/bettyspectra.png">
+
+Variance can be mitigated by a spectral estimate that incorporates some type of *frequency-domain averaging*, as is the case here.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Model Trajectories
+<img style="width:100%"  src="../../figures/noninertialtrajectories.png">
+
+Particle trajectories in a model of baroclinic turbulence on a
+`$\beta$` plane, from a simulation by E. Danioux.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#The Periodogram
+<img style="width:100%"  src="../../figures/noninertialperiodogram.png">
+
+Rotary spectra estimated using the periodogram.
+Red line is a characteristic frequency that we can ignore.
+---
+class: center, .toc[[&#10023;](../index.html)]
+#Blurring Illustration
+<img style="width:100%"  src="../../figures/noninertialadaptive.png">
+
+Periodgram vs. adaptive multitaper estimate.  We will see that the periodogram is dominated by an artifact called *spectral blurring*.
+
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Spectrum (Take Two)
+
+We have said that the spectrum is the Fourier transform of the autocovariance.  But what is the spectrum itself?
+
+
+We know the spectrum is somehow about squared frequency-domain coefficients, and we have said `$S_m\equiv \frac{1}{N}\left|Z_m\right|^2$` is an *estimate* of the spectrum called the periodogram.
+
+--
+
+We would like to just write `$z(t)$` in terms of its Fourier transform
+
+`\begin{equation}
+  z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} Z(\omega)\, e^{i\omega t} d\omega,\quad\quad Z(\omega)\equiv  \int_{-\infty}^{\infty} z(t)\, e^{-i\omega t}  d t
+\end{equation}`
+
+and then define the spectrum as `$S(\omega)\equiv E\left\{\left|Z(\omega)\right|^2\right\}$`.
+
+The spectrum is indeed, essentially, the expected squared magnitude of a Fourier-domain coefficient.
+
+But `$S(\omega)\equiv E\left\{\left|Z(\omega)\right|^2\right\}$` is not quite right because the above equations have a mathematical difficulty that we must circumvent.
+
+
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Defining the Spectrum
+
+Earlier in this lecture we defined the spectrum as the Fourier transform of the autocovariance function.
+`\[R (\tau) =    \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega \tau}  S(\omega) \, d\omega,\quad\quad S(\omega) \equiv  \int_{-\infty}^\infty e^{-i \omega \tau}  R(\tau) d\tau\]`
+This is unsatisfactory because we know that the spectrum is related to the square of the Fourier transform of a time series.
+
+However, we intentionally defined it in this way in order to sidestep a technical difficulty, which we now address.
+
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Continuous Time Fourier
+
+For processes defined on continuous time `$z(t)$`, we need to use the continuous-time, continuous frequency Fourier transform equations
+
+`\begin{equation}
+  z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} Z(\omega)\, e^{i\omega t} d\omega,\quad\quad Z(\omega)\equiv  \int_{-\infty}^{\infty} z(t)\, e^{-i\omega t}  d t
+\end{equation}`
+
+These differ from the discrete Fourier equations because *both* `$z(t)$` and `$Z(\omega)$` have values everywhere, not only at discrete intervals and perhaps not only over a certain time or frequency interval.
+
+For these equations to be valid, it is necessary for `$z(t)$` and `$Z(\omega)$` to satisfy some conditions.   If both functions are absolutely integrable,
+`\begin{equation}
+  \int_{-\infty}^{\infty} | z(t) | \, dt<\infty,\quad\quad\quad  \int_{-\infty}^{\infty} |Z(\omega)|\, d \omega  <\infty
+\end{equation}`
+then it can be shown that the Fourier transform equations hold.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#A Wrinkle in Time Domain
+
+When dealing with time series `$z(t)$` that we consider as stochastic processes, we run into a wrinkle when we try to represent them in the Fourier domain.
+
+Our time series `$z(t)$` will be absolutely integrable if it is, say, a Gaussian shape, or a boxcar, or in general any time-localized signal with bounded (non-infinite) amplitude.
+
+This is a big problem with stochastic processes!  We want to think of them as having a Fourier transform, but most processes of interest&mdash;such as white noise&mdash;will not be absolutely integrable.
+
+This means the Fourier transform
+`\begin{equation}
+  Z(\omega)\neq  \int_{-\infty}^{\infty} z(t)\, e^{-i\omega t}  d t
+\end{equation}`
+is not even valid when `$z(t)$` is a stochastic process, because the integral cannot be associated with a specific finite value.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#A Wrinkle in Time Domain
+
+If you remember from day one, we said that we believed the observed data represents *samples* of some real-world process,
+
+`\[z_n\equiv z(\Delta n), \quad\quad n=0,1,\ldots N-1\]`
+
+where we can conceptualize `$z(t)$` as a stochastic process that goes on forever in both directions.
+
+--
+
+But because they are not absolutely integrable, **stochastic processes do not have Fourier transforms in the usual sense!**
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Unwrinkle the Wrinkle
+
+Loosely speaking, the problem is that `$Z(\omega)$` would need to be infinite.
+
+There is a way around this, in which we replace the usual inverse Fourier transform with a relative:
+
+`\begin{equation}
+\overset{\mathrm{(deterministic)\\}}{z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} Z(\omega)\, e^{i\omega t} d\omega}\quad\quad\quad
+  \boxed{ \overset{\mathrm{(stochastic)\\}}{z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty}  e^{i\omega t} dZ(\omega)}}
+\end{equation}`
+
+The crucial equation on the right is called the *Cram&eacute;r spectral representation theorem*.
+
+Note a seemingly small change:  `$Z(\omega)d\omega$` is replaced with `$dZ(\omega)$`.
+
+This lets us think of the stochastic process `$z(t)$` as being, *in a generalized sense*, the Fourier transform of a frequency-domain process `$dZ(\omega)$`, known as the *increment process.*
+
+
+<!--This actually reflects a *redefinition of integration*.-->
+
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Cram&eacute;r Theorem
+
+Let's compare the two equations
+
+`\begin{equation}
+  z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} Z(\omega)\, e^{i\omega t} d\omega,\quad\quad\quad
+  z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty}  e^{i\omega t} dZ(\omega)
+\end{equation}`
+
+The equation on the left involves deterministic quantities, whereas the equation on the right involves stochastic quantities.
+
+More importantly, however, the very definition of an integral has changed! On the left is the usual Riemann integral defined as the limit of a sum as the step size goes to zero. On the right we have something somewhere different called a Riemann–Stieltjes integral involving a different limiting process.
+
+The essential idea is that we group the potentially non-finite value of `$Z(\omega)$` together with an infinitesimal `$d\omega$` in the integrand.  This combination makes the integral manageable again.
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#The Cram&eacute;r Theorem
+
+Fortunately, we rarely (probably never) need to worry about the technical details of the integration.
+
+The main point is that there is the *idea* of an inverse Fourier transform that works for stochastic processes, and that is called the Cram&eacute;r spectral representation theorem.
+
+`\begin{equation}
+  \boxed{z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty}  e^{i\omega t} dZ(\omega)}
+\end{equation}`
+
+Like it relative for deterministic processes, this states again that `$z(t)$` can be built up from different oscillatory components.
+
+
+--
+Note, for stochastic processes, we don't have a forward Fourier transform equation in the usual sense!
+
+`\begin{equation}
+  dZ(\omega) \ne  \int_{-\infty}^{\infty}  e^{-i\omega t} z(t) dt
+\end{equation}`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Stationarity Implications
+
+For the proof,  we substitute the Cram&eacute;r spectral representation theorem for `$z(t)$` in the definition of the autocovariance, leading to
+`\begin{multline}
+R (t,\tau)\equiv\mathrm{E}\{z(t+\tau)\,z^*(t)\}\\
+=\mathrm{E}\left\{\left[\frac{1}{2\pi} \int_{-\infty}^{\infty}  e^{i\omega (t+\tau)} dZ(\omega)\right]\left[\frac{1}{2\pi} \int_{-\infty}^{\infty}  e^{-i\nu t} dZ^*(\nu)\right]\right\}\\
+=\frac{1}{\left(2\pi\right)^2} \int_{-\infty}^{\infty}\int_{-\infty}^{\infty}
+e^{i(\omega-\nu) t+i\omega\tau} \,
+\mathrm{E}\left\{ dZ(\omega) \,dZ^*(\nu)\right\}.
+\end{multline}`
+In general, the right hand side is a function of both `$t$` and `$\tau$`.
+
+If we want to enforce the condition that the time series is stationary, we need `$R(\tau)$`.   This *requires*  `$\mathrm{E}\left\{ dZ(\omega) \,dZ^*(\nu)\right\}$` to vanish or `$\omega\ne\nu$`!
+
+This fact means *we must have*, for some function `$S(\omega)$`
+
+ `\[S(\omega)\delta(\omega-\nu)\, d\omega d\nu\equiv \frac{1}{2\pi}\mathrm{E}\left\{dZ(\omega) dZ^*(\nu)\right\}.\]`
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Stationarity Implications
+
+At the moment, `$S(\omega)$` is simply the coeffient of the delta function that we need to guarantee stationarity
+
+`\[S(\omega)\delta(\omega-\nu)\, d\omega d\nu\equiv \frac{1}{2\pi}\mathrm{E}\left\{dZ(\omega) dZ^*(\nu)\right\}.\]`
+
+Inserting this into the expression for the autocovariance, we find
+
+
+`\begin{multline}
+R (t,\tau)\equiv\mathrm{E}\{z(t+\tau)\,z^*(t)\}\\
+=\frac{1}{2\pi} \int_{-\infty}^{\infty}\int_{-\infty}^{\infty}
+e^{i(\omega-\nu) t+i\omega\tau} \,
+S(\omega)\delta(\omega-\nu)\, d\omega \,d\nu\\
+=\frac{1}{2\pi} \int_{-\infty}^{\infty} e^{i\omega\tau} \,S(\omega) d\omega
+\end{multline}`
+using the fundamental property of a delta function.  Thus we see that this choice has eliminated time on the right-hand side, and thus now the autocovariance is now `$R(\tau)$`.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Defining the Spectrum
+
+For a stationary random process `$z(t)$`, we can now re-define the spectrum as
+`\begin{equation}
+S(\omega)\delta(\omega-\nu)\, d\omega d\nu\equiv \frac{1}{2\pi}\mathrm{E}\left\{dZ(\omega) dZ^*(\nu)\right\}
+\end{equation}`
+directly in terms of `$dZ(\omega)$`, the frequency-domain increment process generating `$z(t)$` via the Cram&eacute;r spectral representation theorem.
+
+This equation admittedly looks bizarre at first, with a delta function as a part of the definition, as well as a `$d\omega$` that we normally only see inside of an integral.
+
+However, its intuitive content is that for `$\omega=\nu$`, we have the value of `$S(\omega)$` essentially being set to `$\frac{1}{2\pi}\mathrm{E}\left\{|dZ(\omega) |^2\right\}$`, plus extra maths.
+
+Now we begin to see why the discrete Fourier spectrum can be estimated by the periodogram, `$\widehat S_m\equiv \frac{1}{N}\left|Z_m\right|^2$`.
+---
+class: left, .toc[[&#10023;](../index.html)]
+##Spectrum and Autocovariance
+It follows from this new definition of the spectrum that
+`\[
+\boxed{S(\omega) =  \int_{-\infty}^\infty e^{-i \omega \tau}  R(\tau) d\tau , \quad\quad R (\tau) =    \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega \tau}  S(\omega) \, d\omega} \]`
+where the previous &ldquo;`$\equiv$`&rdquo; sign on the left is now an equals sign.
+
+This is another key foundation of spectral analysis.  If one defines the autocovariance `$R(\tau)$` and spectrum `$S(\omega)$`, respectively, as
+`\begin{equation}
+R (\tau)\equiv\mathrm{E}\{z(t+\tau)\,z^*(t)\},\quad S(\omega)\delta(\omega-\nu)\, d\omega d\nu \equiv \frac{1}{2\pi}\mathrm{E}\left\{dZ(\omega) dZ^*(\nu)\right\}
+\end{equation}`
+then **the spectrum and the autocovariance form a Fourier transform pair.**
+
+We can write this in a shorthand notation as
+`\[R(\tau)\quad\Longleftrightarrow\quad S(\omega).\]`
+
+<!--That the spectrum is the Fourier transform of the autocovariance function is now a *consequence* of our new frequency-domain definition of the spectrum, rather than a definition itself.-->
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Summary, Part I
+
+(i) The sampling model
+
+`\[  z_n \equiv z(\Delta n),\quad\quad n=0,1,\ldots,N-1  \]`
+
+(ii) Euler's formula
+
+`\[  e^{i\omega t} = \cos(\omega t) + i \sin(\omega t)  \]`
+
+
+(iii) The discrete Fourier transform
+
+`\[z_n=\frac{1}{N}\sum_{m=0}^{N-1} Z_m e^{i2\pi nm/N},\quad\quad\quad  Z_m \equiv  \sum_{n=0}^{N-1}z_n e^{-i2\pi nm /N} \]`
+
+(iv) The continuous Fourier transform
+
+`\begin{equation}
+  z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} Z(\omega)\, e^{i\omega t} d\omega,\quad\quad Z(\omega)\equiv  \int_{-\infty}^{\infty} z(t)\, e^{-i\omega t}  d t
+\end{equation}`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Summary, Part II
+
+(v) The wavelet transform
+
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
+
+
+(vi)  The Cram&eacute;r spectral representation of a stochastic process
+
+`\begin{equation}
+z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty}  e^{i\omega t} dZ(\omega)
+\end{equation}`
+
+
+(vii) The spectrum and autocovariance are a Fourier transform pair
+
+`\[R (\tau)\equiv\mathrm{E}\{\left[z(t+\tau)-\eta\right]\left[z(t)-\eta\right]^*\}\]`
+
+`\[S(\omega)\delta(\omega-\nu)\, d\omega d\nu\equiv \frac{1}{2\pi}\mathrm{E}\left\{dZ(\omega) dZ^*(\nu)\right\}\]`
+
+`\[R (\tau) =    \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega \tau}  S(\omega) \, d\omega,\quad\quad S(\omega) = \int_{-\infty}^\infty e^{-i \omega \tau}  R(\tau) d\tau  \]`
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Conclusion
+
+
+The spectrum is the fundamental second-order description of a stochastic time series.
+
+Loosely speaking, it's the expected value of the square of the Fourier coefficients.  But defining this precisely is a bit of mathematical challenge.
+
+There are three challenges in estimating it, the details of which we'll understand shortly.
+
+
+<!--Three particular challenges are: (i) aliasing, due to the discrete sample interval; (ii) spectral blurring, due to the truncation to finite duration; and (iii) variance, due to stochastic variability.-->
+
+
+
+
+<!-- 1.  Use Euler's formula to write down `$e^{i\omega_o t}+e^{-i\omega_o t}$` and `$e^{i\omega_o t}-e^{-i\omega_o t}$`.
+1.  Draw the Fourier transforms of `$e^{i\omega_o t}$` and `$e^{-i\omega_o t}$`.
+1.  Draw the Fourier transforms of `$\cos(\omega_o t)$` and `$\sin(\omega_o t)$`.
+1.  Write down the form of the inverse Fourier transform equation, `$x(t)=$`.  What does a shift in time correspond to in the frequency domain?
+1.  Write down the form of the forward Fourier transform equation, `$X(\omega)=$`.  What does a shift in frequency correspond to in the time domain?
+1.  Draw a rectangle or boxcar function of time and its Fourier transform, to the best of your memory.  Label the zero frequency.
+2.  Repeat #2 but for a boxcar multiplied by `$e^{i\omega_o t}$`.
+2.  Repeat #2 but for a boxcar multiplied by `$\cos(\omega_o t)$`.-->
+
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+            <!--Browser-specific hack for Safari tilde bug -->
+    <!--thanks to dpvc at https://github.com/mathjax/MathJax/issues/1737-->
+        if (MathJax.Hub.Browser.isSafari && parseInt(MathJax.Hub.Browser.webkit) >= 603) {
+  MathJax.Hub.Register.StartupHook("HTML-CSS Jax Ready", function () {
+    var HTMLCSS = MathJax.OutputJax["HTML-CSS"];
+    var MML = MathJax.ElementJax.mml;
+    var toHTML = MML.mo.prototype.toHTML;
+    MML.mo.Augment({
+      toHTML: function (span) {
+        span = toHTML.call(this,span);
+        if (span.bbox.w === 0 && span.bbox.lw < 0 && span.firstChild) {
+          span.style.marginLeft = HTMLCSS.Em(span.bbox.lw);
+        }
+        return span;
+      }
+    });
+  });
+}
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>

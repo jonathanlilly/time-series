@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+name: summary
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[Summary]
+
+
+<!--
+class: left, .toc[[&#10023;](../index.html)]
+#In-Class Assignments
+1.  In Matlab, let `$n=(0:N-1)'$` for some choice `$N$`.  Form the array `$x=2*($`<tt>iseven</tt>`$(n)-1/2)$` and understand what this is giving you. Then take `$X=$`<tt>fft</tt>`$(x)$` for both `$N$` even and odd.
+2.  As a result of this excercise, at what position does the highest resolvable frequency appear in the Fourier transform?  Know this in one-based counting, the position in the Matlab array, and in zero-based counting, which we are using for algebra.
+4. Run <tt>psi=sleptap(length(x),M);</tt> followed by <tt>[f,S]=mspec(dt,x,psi)</tt> for `$M=4$.`  Compute the variance by integrating the spectrum, not forgetting to multiply by the frequency interval.  Compare to the variance computed directly from `$x$.`  Do these match?
+1. Run <tt>psi=sleptap(length(x),M);</tt> for `$M=3$.` Plot `$\psi$` on the left axis of a plot and the log of its <tt>fft</tt> on the right-hand side.  -->
+
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+**The sampling model**
+
+`\[z_n=z(n \Delta)\]`
+
+
+**Euler's formula**
+
+`\[  e^{i\omega t} = \cos(\omega t) + i \sin(\omega t)  \]`
+
+
+**The discrete Fourier transform**
+
+`\[z_n=\frac{1}{N}\sum_{m=0}^{N-1} Z_m e^{i2\pi nm/N},\quad\quad\quad  Z_m \equiv  \sum_{n=0}^{N-1}z_n e^{-i2\pi nm /N} \]`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+**Continuous Fourier transform for deterministic signals**
+
+`\begin{equation}
+  g(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} G(\omega)\, e^{i\omega t} d\omega,\quad\quad G(\omega)\equiv  \int_{-\infty}^{\infty} g(t)\, e^{-i\omega t}  d t
+\end{equation}`
+
+
+**The Cram&eacute;r spectral representation of a stochastic process**
+
+`\begin{equation}
+z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty}  e^{i\omega t} dZ(\omega)
+\end{equation}`
+
+**Spectrum and autocovariance, a Fourier transform pair**
+
+`\begin{equation}
+R (\tau)\equiv\mathrm{E}\{z(t+\tau)\,z^*(t)\},\quad\quad S(\omega)\delta(\omega-\nu)\, d\omega d\nu\equiv \frac{1}{2\pi}\mathrm{E}\left\{dZ(\omega) dZ^*(\nu)\right\}
+\end{equation}`
+
+`\[S(\omega) =  \int_{-\infty}^\infty e^{-i \omega \tau}  R(\tau) d\tau , \quad\quad R (\tau) =    \frac{1}{2\pi}\int_{-\infty}^\infty e^{i \omega \tau}  S(\omega) \, d\omega \]`
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+**The origin of broadbias**
+
+
+We consider a truncated version of our continuously sampled time series, `$z_T(t)\equiv z(t) \Pi_T(t)$`.  Its expected autovariance is
+
+`\[R_T(\tau) \equiv \mathrm{E}\left\{\frac{1}{T}\int_{-T/2}^{T/2} z_T(t+\tau) z_T^*(t) dt   \right\}\]`
+
+which corresponds to an expected periodogram-like spectral estimate that is a filtered version of the true spectrum
+
+`\[R_T(\tau) =  R(\tau) \Lambda_T(\tau) \Longleftrightarrow S_T(\omega) \equiv \int_{-\infty}^\infty S(\omega-\nu) F_T(\nu) d \nu\]`
+
+where `$F_T(\omega)\equiv \int_{-\infty}^{\infty}\Lambda_T(t)e^{i\omega\tau} \, d \tau
+=\frac{1}{T}\frac{\sin^2(\omega T/2)}{(\omega/2)^2}$` is the Fej&eacute;r kernel.
+
+`\begin{equation}
+\Pi_T(t)\equiv \left\{\begin{array} {cc} 1, & t\le T/2 \\ 0, & t> T/2 \end{array}\right.,\quad\quad\quad
+\Lambda_T(t)\equiv \left\{\begin{array} {cc} 1-\frac{|\tau|}{T}, & t\le T \\ 0, & t> T \end{array}\right.
+\end{equation}`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+**Multitaper spectral estimation**
+
+Let `$\psi_n^{\{k\}}$` be `$K=2P-1$` length-`$N$` orthogonal functions that are optimally concentrated in a frequency band `$2P$` Rayleigh frequencies wide centered at zero.
+
+`$K$` spectral estimates, known as the &ldquo;eigenspectra&rdquo;, are defined as
+
+`\[\widehat S_m^{\{k\}}\equiv \left|\sum_{n=0}^{N-1} \psi_n^{\{k\}} z_n\, e^{-i 2\pi m n/N}\right|^2,\quad\quad n=0, 1, 2, \ldots,N-1.\]`
+
+are averaged to give the *multitaper spectral estimate*
+
+`\[\widehat S_m^{\psi}\equiv \frac{1}{K}\sum_{k=1}^K\widehat S_m^{\{k\}}.\]`
+
+This reduces bias by tapering the data with functions that minimize broadband leakage from *outside* the  `$2P$` band, while reducing variance through approximating an average over independent Fourier coefficients *within* the `$2P$` band.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+
+**The continuous wavelet transform**
+
+The Morse wavelets are defined in terms of their Fourier transform
+`\[\psi_{\beta,\gamma}(t) \Longleftrightarrow \Psi_{\beta,\gamma}(\omega) = \left\{ \begin{array}{ccc} a_{\beta,\gamma} \,\omega^\beta e^{-\omega^\gamma}, && \omega>0 \\ 0, && \omega\le 0\end{array}\right.\]`
+
+Since `$\Psi_{\beta,\gamma}(\omega)$` is real, `$\psi_{\beta,\gamma}(t) = \psi_{\beta,\gamma}^*(-t)$`. The wavelet transform is
+
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi\left(\frac{\tau-t}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
+
+and scale is mapped to frequency by `$\omega=s/\omega_{\beta,\gamma}$` with `$\omega_{\beta,\gamma}\equiv(\beta/\gamma)^{1/\gamma}$`.
+
+Note, this is a *joint function* of the signal and the wavelet!!
+
+`\begin{align}
+&z(t) = \delta(t-t_o) &\!\!\!\!\!\!\! \Longrightarrow \quad \quad & w(t,s) = \frac{1}{s} \psi^*\left(\frac{t-t_o}{s}\right) \\
+&\left.\begin{array}{l}
+z(t) = e^{i\omega_o t}\\
+Z(\omega) = 2\pi \delta(\omega-\omega_o)
+\end{array} \right\}&\!\!\!\!\!\!\!\Longrightarrow \quad \quad  & w(t,s) =   \Psi(s\omega_o) e^{i\omega_o t}
+\end{align}`
+
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+            <!--Browser-specific hack for Safari tilde bug -->
+    <!--thanks to dpvc at https://github.com/mathjax/MathJax/issues/1737-->
+        if (MathJax.Hub.Browser.isSafari && parseInt(MathJax.Hub.Browser.webkit) >= 603) {
+  MathJax.Hub.Register.StartupHook("HTML-CSS Jax Ready", function () {
+    var HTMLCSS = MathJax.OutputJax["HTML-CSS"];
+    var MML = MathJax.ElementJax.mml;
+    var toHTML = MML.mo.prototype.toHTML;
+    MML.mo.Augment({
+      toHTML: function (span) {
+        span = toHTML.call(this,span);
+        if (span.bbox.w === 0 && span.bbox.lw < 0 && span.firstChild) {
+          span.style.marginLeft = HTMLCSS.Em(span.bbox.lw);
+        }
+        return span;
+      }
+    });
+  });
+}
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>

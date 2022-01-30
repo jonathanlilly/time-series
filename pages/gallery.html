@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+name: gallery
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[A Gallery of Visualizations]
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Overview
+
+In this lecture we'll look at some examples of data visualizations and simple analyses from several papers.
+
+We will give names to different plot types as way to understand generic approaches that can be applied in different situations.
+
+Try to appreciate them from a great distance, understanding how they are presenting information rather than the details.
+
+Imagine how you might use each of these to examine your data, and makes notes of which plot types would be most likely to be useful.
+
+
+---
+class: middle, center, .toc[[&#10023;](../index.html)]
+
+Some examples from
+
+Hattermann, T., L. H. Smedsrud, O. A. N&oslash;st, J. M. Lilly, and B. K. Galton-Fenzi (2014). Eddy-resolving simulations of the Fimbul Ice Shelf cavity circulation: Basal melting and exchange with open ocean. [{link}](https://doi.org/10.1016/j.ocemod.2014.07.004)
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Schematic
+
+<center><img style="width:90%"  src="../figures/fimmodel-schematic.png"></center>
+
+A visual representation of your hypothesis of how the system works.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Orientation Plot + The Snapshot
+
+<center><img style="width:62%"  src="../figures/fimmodel-orientation.png"></center>
+
+This combination of two plots is more meaningful than either alone.
+
+
+---
+class: middle, center, .toc[[&#10023;](../index.html)]
+
+An example from
+
+Hattermann, T.,  O. A. N&oslash;st, J. M. Lilly, and L. H. Smedsrud (2012). Two years of oceanic observations below the Fimbul Ice Shelf, Antarctica.  [{link}](https://doi.org/10.1029/2012GL051012)
+
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Offset Line Plot
+
+<center><img style="width:70%"  src="../figures/fimbul-lineplot.png"></center>
+
+Note (i) stacked axes and (ii) the very informative use of color.
+
+---
+class: middle, center, .toc[[&#10023;](../index.html)]
+
+An example from
+
+Trodahl, M., P. E. Isachsen, J. Nilsson, J. M. Lilly, and N. M. Kristensen (2020). The regeneration of the Lofoten Vortex through vertical alignment.  [{link}](https://doi.org/10.1175/JPO-D-20-0029.1)
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Series of Snapshots
+
+<center><img style="width:100%"  src="../figures/trodahl-snapshots.png"></center>
+
+The eye fills in the gaps, giving the impression of a movie.
+
+There are five (!) dimensions visualized in this plot:
+x, y, z, time, and density (color).
+
+---
+class: middle, center, .toc[[&#10023;](../index.html)]
+
+Some examples from
+
+Lilly, J. M. and P. Pérez-Brunius (2021b). Extracting statistically significant eddy signals from large Lagrangian datasets using wavelet ridge analysis, with application to the Gulf of Mexico. [{link}](https://doi.org/10.5194/npg-28-181-2021)
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##  The Spaghetti Plot
+
+<center><img style="width:75%"  src="../figures/gulfdrifters_spaghetti.png"></center>
+
+A plot of the trajectories along which measurements are taken.
+Note use of symbols to denote trajectory start point.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##  2D Histogram and Classification Map
+
+<center><img style="width:100%"  src="../figures/gulfdrifters_datadistributions.png"></center>
+
+Log10 number of observations in bins from 15 different experiments (left).
+Most common experimental source in each bin (right).
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##  Creative Line Plot
+
+<center><img style="width:75%"  src="../figures/gulfdrifters_ranges.png"></center>
+
+Information in (a) line color (b) line length (c) line x-start point and (d) line y-start point.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##  Dovetailing 2D Histograms
+
+
+.left-column[<img style="width:75%"  src="../figures/gulfdrifters_slicessampled.png">]
+
+.right-column[Top: Histogram of month-long time periods sampled in each latitude/longitude bin.
+
+Bottom: The same information, but now in longitude/month bins.
+
+Note the x-axes are the same, i.e. we are looking at 3D distribution in two 2D slices.]
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##  Downscaling Dataset Resolution
+
+<center><img style="width:100%"  src="../figures/gulfdrifters_gridvariance.png"></center>
+
+Right: Variability of the average in each bin about the time average.
+Left: Variability within each bin to the time-dependent bin average.
+
+The variability on the left is the variability that we lose when we grid the data.  We can keep track of this lost variability explicitly.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Shaded Vector Plot and Streamline Plot
+
+<center><img style="width:100%"  src="../figures/gulfcirculation.png"></center>
+
+Left: mean flow field displayed as arrows, superposed on color shading showing, in this case, the mean flow magnitude.
+
+Right: the same mean flow field visualized as artificial particle trajectories, a.k.a. a streamline plot.  Color shows initial longitude.
+
+---
+class: middle, center, .toc[[&#10023;](../index.html)]
+
+Some examples from
+
+Lilly, J. M. and P. B. Rhines (2002). Coherent eddies in the Labrador Sea observed from a mooring. [{link}](https://journals.ametsoc.org/view/journals/phoc/32/2/1520-0485_2002_032_0585_ceitls_2.0.co_2.xml)
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Simple Line Plot
+
+<center><img style="width:90%"  src="../figures/coherenteddies-lineplot.png"></center>
+
+Simple line plots can be very useful, especially when labelled.
+Note the &ldquo;Mean+Variability&rdquo; plot in the middle.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+##  The Event Plot
+
+
+.left-column[<img style="width:85%"  src="../figures/coherenteddies-eventplot.png">]
+
+.right-column[Multiple fields are shown with apparent events indicated, in this case, by a line.
+
+The top panel is &ldquo;Stickvector Plot&rdquo; of velocity. ]
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Hodographs and Progressive Vectors
+
+<center><img style="width:100%"  src="../figures/coherenteddies-hodoplot.png"></center>
+
+Left: A hodograph, the curve traced out by the velocity vector.
+Right: The progressive vector diagram, the integral of the velocity.
+
+These are examples of &ldquo;3D Scatter Plots&rdquo; with color showing a third quantity.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Kinematic Model
+
+<center><img style="width:100%"  src="../figures/coherenteddies-kinematicmodel.png"></center>
+
+An often powerful approach is to come up with a simple conceptual model (that is, a hypothesis) for what you think is happening.
+
+In this case, we look at what happens when a Gaussian eddy is advected past a mooring.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Synthetic Observations
+
+<center><img style="width:100%"  src="../figures/coherenteddies-synthetic.png"></center>
+
+Then we may try to recreate quasi-realistic observations.
+This can be a powerful way to scrutinize proposed hypotheses.
+
+Here, we have a hodograph and progressive vector diagram generated by several eddies advecting each other.  Look familiar?
+
+
+---
+class: middle, center, .toc[[&#10023;](../index.html)]
+
+Some examples from
+
+Lilly, J. M., P. B. Rhines, F. Schott, K. Lavender, J. Lazier, U. Send, and E. D'Asaro (2003). Observations of the Labrador Sea eddy field. [{link}](https://doi.org/10.1016/j.pocean.2003.08.013)
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Kitchen Sink Plot
+
+.left-column[<img style="width:100%"  src="../figures/olsef-kitchensink.png">]
+
+.right-column[If you have a lot of datasets or fields that are interrelated, one approach is to try to show them all from some common perspective.
+
+Here, we're looking at the annual cycle (left) and interannual variability (right) in various fields.
+
+Small detail, note the flipped y-axis locations, the bottom two of which are shared between left and right.]
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Offset Line Plot
+
+<center><img style="width:85%"  src="../figures/olsef-offsetline.png"></center>
+
+Lines show the measured variables, as well as the depth and time over which the measurements were taken.
+
+<!--class: center, .toc[[&#10023;](../index.html)]
+## Selected Contours
+
+.left-column[<img style="width:100%"  src="../figures/olsef-contourandline.png">]
+
+.right-column[Here shading is used together with selected contours, to help show small-scale structure without the plot becoming too busy.
+
+Both black lines and white lines are used for better visibility.]-->
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Representative Event Plot
+
+<center><img style="width:75%"  src="../figures/olsef-representativeevents.png"></center>
+
+When analyzing multiple events, showing examples is useful.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## Colocated Event Observations
+
+<center><img style="width:85%"  src="../figures/olsef-twoplatforms.png"></center>
+
+When different platforms observe similar events, you can try to find instances where both observe the same event at the same time.
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Waterfall Plot
+
+<center><img style="width:90%"  src="../figures/olsef-waterfall.png"></center>
+
+A waterfall plot, or dense offset line plot, is useful when we're trying to draw attention to common features, for example.
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Composite Event Plot
+
+.left-column[<img style="width:100%"  src="../figures/olsef-composite.png">]
+.right-column[Then you can talk about a typical event by averaging to form a composite.
+
+Here vertical bars are used to represent the spread of the ensemble about the composite. ]
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## 3D Scatter Plot
+
+<center><img style="width:90%"  src="../figures/olsef-3dscatter.png"></center>
+
+Quantitative 3D scatter plots can be very informative.
+
+Size represents event magnitude, with the key shown on the right.
+Note the use of (i) dovetailing axes and (ii) redundant information.
+
+---
+class: middle, center, .toc[[&#10023;](../index.html)]
+
+An example from
+
+Lilly, J. M. and S. C. Olhede (2012). Generalized Morse wavelets as a superfamily of analytic wavelets. [{link}](http://doi.org/10.1109/TSP.2012.2210890)
+
+---
+class: center, .toc[[&#10023;](../index.html)]
+## The Zoo Plot
+
+<center><img style="width:100%"  src="../figures/superfamily-zooplot.png"></center>
+
+In the Zoo Plot, we try to show a range of possibilities through numerous examples, as a function of some parameter space.
+
+
+Here, left is time domain and right is Fourier domain.
+
+
+
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+            <!--Browser-specific hack for Safari tilde bug -->
+    <!--thanks to dpvc at https://github.com/mathjax/MathJax/issues/1737-->
+        if (MathJax.Hub.Browser.isSafari && parseInt(MathJax.Hub.Browser.webkit) >= 603) {
+  MathJax.Hub.Register.StartupHook("HTML-CSS Jax Ready", function () {
+    var HTMLCSS = MathJax.OutputJax["HTML-CSS"];
+    var MML = MathJax.ElementJax.mml;
+    var toHTML = MML.mo.prototype.toHTML;
+    MML.mo.Augment({
+      toHTML: function (span) {
+        span = toHTML.call(this,span);
+        if (span.bbox.w === 0 && span.bbox.lw < 0 && span.firstChild) {
+          span.style.marginLeft = HTMLCSS.Em(span.bbox.lw);
+        }
+        return span;
+      }
+    });
+  });
+}
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>

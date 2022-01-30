@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <title>Time Series Analysis</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+ <!-- CSS modifications by J. M. Lilly-->
+
+ <style type="text/css">
+body { font-family: "Georgia","Times New Roman",Times,serif;letter-spacing:0.025em;}
+h1, h2, h3 {
+  font-family: "Georgia","Times New Roman",Times,serif;
+  font-weight: normal;
+}
+.remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:-.25em}
+.remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+.remark-slide-content p,ol,ul { font-size: 1.2em; }
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+.remark-fading { z-index: 9; }
+.toc {bottom:12px;opacity:0.5;position:absolute;left:30px;font-size: 1.4em;}/*JML*/
+/*I find this by jgrepping for remark for slide-number, see resources.js*/
+
+/* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+.remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+.remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+
+/* Two-column layout */
+.left-column {
+  width: 50%;
+  float: left;
+}
+.right-column {
+  width: 49%;
+  float: right;
+  padding-top: 0em;
+  margin-top: 0em;
+  text-align: left;
+}
+.footnote {
+  position:absolute;
+  bottom: 2em;
+  left: 14em;
+  font-size: 0.7em;
+ }
+
+/* Some special classes */
+.maintitle {font-size: 1.6em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.title {font-size: 2.4em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+.author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}
+.institution {font-size: 1.0em;}
+.date {font-size: 1.0em;font-style: italic}
+.note {font-size: 0.8em;font-style: italic}
+.outerlist {font-size: 1.2em;font-weight: bold}
+
+.caption {font-size: 0.65em;}
+.cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+.strike {color:salmon;text-decoration:line-through}
+
+/*Set color scheme for links.*/
+a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+/*Setting link properties is particular, do not change order below*/
+a:visited {color:#666666}
+a:hover {color:#33AA99}
+a:active, a#active {color:#FF9700;}
+ </style>
+  </head>
+  <body>
+ <textarea id="source">
+
+name: gallery
+class: center,middle, .toc[[&#10023;](../index.html)]
+.title[Data Analysis Roadmap]
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Phase 0: Preparation
+
+Being like an accountant.
+
+* .outerlist[Studying coding basics and best practices]
+* .outerlist[Gathering unprocessed datasets]
+   * Calibration & quality control
+   * Despiking as needed (visual/subjective; global or running  `$n\sigma$`&nbsp;deviation, median, 2nd difference, etc.; iterative exclusion; fancier methods)
+   * Interpolation to uniform grid if needed (linear, quadratic, or spline; optimal interpolation, local polynomial fit, or spline basis; error assessment )
+   * Dataset organization & documentation
+   * &rArr; Working dataset version <br/> (! With all processing code in a script !)
+* .outerlist[Gathering other relevant processed data]
+* .outerlist[Meta-organization]
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Phase 1: Exploratory
+
+Being like an explorer getting a first glimpse of new lands.
+
+* Looking at the data
+* Making a bunch of plots  (! Don't be afraid to make hardcopies !)
+* Following intuition & having fun
+* Clearing your mind of preconceptions
+* Not paying attention to the literature at all
+* Sticking with very simple methods (simple statistics, 1D and 2D histograms and statistics, line plots, simple smoothing)
+* Sidestepping minor technical problems; flag these instead
+* Keeping eyes out for suspicious or intriguing features
+* Refactoring: abstracting figure types, code blocks, etc.
+* &rArr; Data report document / figure stack
+<br/> (! With all processing code in a script / Jupyter notebook!)
+* &rArr; Qualitative, intuitive assessment of noise vs. signal
+* &rArr; List of features or aspect worthy of further investigation
+* &rArr; ? Possibly iterate to Phase 0 with new information
+
+*Do not work directly on the command line without saving your code!  You will be stuck in data purgatory for all eternity!*
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Phase 2: Investigating
+
+Being like a detective patiently building a case.
+
+* Brainstorming (with pen and paper) interpretations of the data
+* Forming **multiple** hypotheses to explain interesting features
+* Countering physical hypotheses with a suitable null hypothesis (e.g. noise or artifacts)
+* Sticking with simple methods (see next slide)
+* Sidestepping roadblocks (! Do not stop when you hit obstacles!)
+* Gathering evidence in support of / opposing these hypotheses
+* Setting aside personal preferences (yours and your advisor's)
+* Setting aside what everyone believes to be true
+* Maintaining a curious, open mind
+* Building a case through plots, argumentation, and analysis
+* Keeping in mind the limitations of the dataset
+* Asking: Is the evidence conclusive?
+* Asking: What other datasets / perspectives could be helpful?
+* Asking: What other methods may be called for?
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Phase 2 Methods
+
+* Clarifying variability at relevant timescales: diurnal, tidal, inertial, annual, etc.
+* Separating variability with simple smoothing, harmonic fits, formation of composite cycle  (e.g. annual), etc., *and residual*
+* Examining all of the Phase 1 aspects on separated components
+* Studying theory of relevant processes to familiarize yourself
+* Forming simple conceptual, kinematic, or statistical model for the observed features
+* Gathering ancillary or environmental data for potential forcing, causative, or associated processes
+* Correlations, EOFs, etc.
+* Higher-order or circular statistics
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Phase 3: Forensics
+
+Bringing in specialize methods to help the investigation.
+
+* Be aware that this is often not necessary!
+* Talk to colleagues with more experience
+* Ask: do I want to learn this, or instead, find a collaborator?
+* Be prepared to sit down and study for weeks or months
+* Learn the method thoroughly *before* applying it to your dataset!
+
+Some possibilities:
+
+* Fourier spectral analysis
+* Wavelet analysis
+* Stochastic modeling
+* Interpolation methods: OI, local polynomial fitting, spline
+* Correlation analysis: CCA, MCA, MLR, SVD
+* Clustering methods
+* Statistical hypotheses testing
+
+
+* &rArr; Definitive evidence *or* inconclusive results
+* &rArr; Proceed to Phase 4 *or* iterate with Phase 2
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Phase 4: Closing the Case
+
+Being like a lawyer presenting the case to the jury.
+
+* Understanding your results within the context of the literature
+* Assessing what makes a unit of scientific progress
+* Putting together a case with figures, equations, and arguments
+* Considering all possible objections <br/> (! Use Thinking Hats and role-playing!)
+* Iterating to earlier phases as needed
+* Building a watertight case
+* Being honest about the limitations of your results
+* Seeing unanswered questions as future possibilities
+* Knowing when to stop
+* Remembering to not get personally involved with your client
+
+Also!
+
+* Learning about data formats and conventions; iterate to 0 and 1
+
+&rArr; A scientific paper; a finished, shared dataset; open software
+
+ </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="../javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!--<script src="./javascript/remark-latest.min.js" type="text/javascript"></script>-->
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript">
+        var slideshow = remark.create({
+            navigation: {
+                click: false
+            },
+            properties: {
+                class: "center, middle"
+            },
+            countIncrementalSlides: false
+        });
+    </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } });
+            <!--Browser-specific hack for Safari tilde bug -->
+    <!--thanks to dpvc at https://github.com/mathjax/MathJax/issues/1737-->
+        if (MathJax.Hub.Browser.isSafari && parseInt(MathJax.Hub.Browser.webkit) >= 603) {
+  MathJax.Hub.Register.StartupHook("HTML-CSS Jax Ready", function () {
+    var HTMLCSS = MathJax.OutputJax["HTML-CSS"];
+    var MML = MathJax.ElementJax.mml;
+    var toHTML = MML.mo.prototype.toHTML;
+    MML.mo.Augment({
+      toHTML: function (span) {
+        span = toHTML.call(this,span);
+        if (span.bbox.w === 0 && span.bbox.lw < 0 && span.firstChild) {
+          span.style.marginLeft = HTMLCSS.Em(span.bbox.lw);
+        }
+        return span;
+      }
+    });
+  });
+}
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML">
+    </script>
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script "text/javascript" src="../../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML,local/local"></script>-->
+</body>
+</html>
