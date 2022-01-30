@@ -8,6 +8,8 @@ Comments, questions, bug reports, etc. are all welcome.  Feel free to email me a
 
 To get started, just open the file `index.html` with any web browser.
 
+Note that the Python translation of the stochastic modeling lab is not yet available.
+
 These notes were made using [Liminal](http://www.jmlilly.net/liminal), a theme for [Remark.js](https://remarkjs.com/), itself a Javascript package for rendering Markdown and LaTeX as Powerpoint-style presentations within a web browser.  A complete distribution of [KaTeX](https://katex.org), a minimal typesetting library for LaTeX, is also included.
 
 Cite as:
