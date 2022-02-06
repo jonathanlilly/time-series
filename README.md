@@ -12,8 +12,8 @@ There you will find lecture notes, viewable through a web browser, as well as la
 
 The lecture notes were made using [Liminal](http://www.jmlilly.net/liminal), a theme for [Remark.js](https://remarkjs.com/), itself a Javascript package for rendering Markdown and LaTeX as Powerpoint-style presentations within a web browser.  A complete distribution of [KaTeX](https://katex.org), a minimal typesetting library for LaTeX, is also included.
 
-Version 0.2 is the initial public release of the *Ocean/Atmosphere Time Series Analysis* course files.  A significant to-do in this version is translating the stochastic modeling code into Python.
+Version 0.21 is the initial public release of the *Ocean/Atmosphere Time Series Analysis* course files.  A significant to-do in this version is translating the stochastic modeling code into Python.
 
 Cite as:
 
-Lilly, J. M. (2022). Ocean/Atmosphere Time Series Analysis, v. 0.2.  Zenodo. [https://doi.org/10.5281/zenodo.5977995](https://doi.org/10.5281/zenodo.5977995).
+Lilly, J. M. (2022). Ocean/Atmosphere Time Series Analysis, v. 0.21.  Zenodo. [https://doi.org/10.5281/zenodo.5977995](https://doi.org/10.5281/zenodo.5977995).
