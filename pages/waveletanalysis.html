@@ -286,11 +286,11 @@ class: left, .toc[[&#10023;](../index.html)]
 
 We see that the wavelet transform  is the filtration of `$z(t)$` with  rescaled versions of  `$\psi(t)$` using the cross-correlation operator:
 
-`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau\]`
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{\tau-t}{s}\right) z(\tau) d\tau\]`
 
 From the cross-correlation theorem and scaling theorems, we have
 
-`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{\tau-t}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
 
 for the frequency-domain form of the wavelet transform.
 
@@ -307,8 +307,8 @@ Two essential transforms are when the signal of interest consists of delta funct
 
 If `$z(t)=\delta(t-t_o)$` then we have
 
-`\begin{align}w(t,s) &=\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau\\
-&=\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) \delta(\tau-t_o) d\tau=\frac{1}{s} \psi^*\left(\frac{t-t_o}{s}\right)
+`\begin{align}w(t,s) &=\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{\tau-t}{s}\right) z(\tau) d\tau\\
+&=\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{\tau-t}{s}\right) \delta(\tau-t_o) d\tau=\frac{1}{s} \psi^*\left(\frac{t_o-t}{s}\right)
 \end{align}`
 
 while if `$Z(\omega)=2\pi \delta(\omega-\omega)$`  then `$z(t)=e^{i\omega_o t}$` and
@@ -516,7 +516,7 @@ class: left, .toc[[&#10023;](../index.html)]
 
 (v) The wavelet transform
 
-`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{t-\tau}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
+`\[w(t,s) =\int_{-\infty}^\infty \frac{1}{s} \psi^*\left(\frac{\tau-t}{s}\right) z(\tau) d\tau=\frac{1}{2\pi} \int_{-\infty}^\infty  \Psi^*(s\omega) Z(\omega) e^{i\omega t} d\omega\]`
 
 *The right hand side of (v) follows from reflection formula; then (v) gives wavelet transform of delta and sinusoid*
 

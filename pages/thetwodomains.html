@@ -113,12 +113,15 @@ These are the sampling model, Euler's Formula, and the discrete Fourier transfor
 e^{i\omega t}=\cos(\omega t)+i \sin(\omega t)\\
 z_n=\frac{1}{N}\sum_{m=0}^{N-1} Z_m e^{i2\pi m n/N},\quad\quad\quad Z_m \equiv  \sum_{n=0}^{N-1}z_n e^{-i2\pi m n/N}. \]`
 
+--
 
 Today we will add a fourth building block,
 `\begin{equation}
   z(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} Z(\omega)\, e^{i\omega t} d\omega,\quad\quad Z(\omega)\equiv  \int_{-\infty}^{\infty} z(t)\, e^{-i\omega t}  d t
 \end{equation}`
-which are the continuous Fourier transform equations.  But note, we will have to take care of what `$z(t)$` is allowed to be in this case.
+which are the continuous Fourier transform equations.
+
+<!--But note, we will have to take care of what `$z(t)$` is allowed to be in this case.-->
 
 ---
 class: left, .toc[[&#10023;](../index.html)]
@@ -773,6 +776,48 @@ The reflection theorems very important results for anyone working with spectral 
 1. Please commit them to memory&mdash;by which I mean the basic idea that you can say in words as on page 34, *not* the symbols.
 1. You should be able to derive all of the reflection equations, see page 33, from the inverse Fourier transform equation by yourself.  Please practice the algebra involved so that it becomes familiar, and clarify any steps that don't make sense to you.
 1. Make sure to include the algebra behind the convolution theorem on page 32.
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#A Note on Fourier Pairs
+
+It two functions `$a(t)$` and `$B(\omega)$` are a Fourier transform pair, then they must satisfy
+
+`\begin{equation}
+a(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} B(\omega)\, e^{i\omega t} d\omega.
+\end{equation}`
+
+This means we think of this equation as having &ldquo;slots&rdquo; that the two functions fit into:
+
+`\begin{equation}
+[\mathrm{some~function~of~}t] =\frac{1}{2\pi} \int_{-\infty}^{\infty}[\mathrm{some~function~of~}\omega]\, e^{i\omega t} d\omega.
+\end{equation}`
+
+where we see that the right-hand side must have `$e^{i\omega t} d\omega$`.
+
+The labelling of the variable of intergration doesn't matter, so we could have instead written
+`\begin{equation}
+[\mathrm{some~function~of~}t] =\frac{1}{2\pi} \int_{-\infty}^{\infty}[\mathrm{some~function~of~}u]\, e^{iu t} du.
+\end{equation}`
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#In-Class Assignment
+
+Let `$G(\omega)$` be defined as the Fourier transform of `$g(t)$`, such that
+
+`\begin{equation}
+g(t) =\frac{1}{2\pi} \int_{-\infty}^{\infty} G(\omega)\, e^{i\omega t} d\omega,\quad\quad  G(\omega)\equiv  \int_{-\infty}^{\infty} g(t)\, e^{-i\omega t}  d t.
+\end{equation}`
+
+Find  the Fourier transforms of (i) `$g(-t)$` and (ii) `$g^*(t)$`.
+
+To do this, you need to manipulate the left-hand equation such that its right-hand side appears in the usual Fourier transform form.
+
+Hint:  You're going to need to use `$\int_{b}^a dx=-\int_{a}^b dx$`. 
+
+
 
 <!--1. Verify the first-and second-order differentiation theorems,
 `\begin{align}

@@ -97,7 +97,7 @@ This implies from Euler's formula, `$e^{ix}=\cos x + i \sin x$`, that
 
 Multiplying out the right-hand-side, we find
 
-`\begin{multline}\cos(A+B) +i \sin(A+B) =\\ \cos A\cos B -\sin A \sin B +i\left[\cos A \sin B + i \cos B\sin A\right] \end{multline}`
+`\begin{multline}\cos(A+B) +i \sin(A+B) =\\ \cos A\cos B -\sin A \sin B +i\left[\cos A \sin B +  \cos B\sin A\right] \end{multline}`
 
 Taking the real and imaginary parts, we have the first two equations.
 
@@ -283,9 +283,7 @@ This lecture looks at a third building block, the Discrete Fourier Transform or 
 
 In this lecture, we will take this equation apart, and understand it hopefully on a deeper level.
 
----
-class: left, .toc[[&#10023;](../index.html)]
-#  In-Class Exercises
+<!-- #  In-Class Exercises
 
 Before continuing with theory, we will play around a bit in Matlab or Python, exploring some aspects of the discrete Fourier transform in practice.
 
@@ -295,9 +293,73 @@ We will work in small groups on these exercises.  Please make sure that everyone
 At which locations in the frequency domain do you see something occurring in each of these three cases?  Do you have an explanation?
 2.  Same as #1  but for `$z(t)=e^{i2\pi f t}$`.  What has changed?
 3.  Same as #1 but for the odd-length time series `$t=[0:1:100]$`.   What has changed?
-4.  As in #1 but for `$x(t)=\sin(2\pi f t)$`  for (a) `$f=1/100$` (b) `$f=1/200$` and (c) `$f=1/400$`.
+4.  As in #1 but for `$x(t)=\sin(2\pi f t)$`  for (a) `$f=1/100$` (b) `$f=1/200$` and (c) `$f=1/400$`.-->
 
 <!-- (a)  1 (or 0) (b) 11 and 91 [10 and 90] (c) 51 [or 50]-->
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#  In-Class Exercises
+
+Consider two variables called `$u$` and `$v$` which have the same units.  These could be eastward and northward components of the wind or currents, or the temperature at two different locations, for example.
+
+1.  Sketch `$u=\cos(\omega t)$` and  `$v=\sin(\omega t)$`.  Also sketch `$u$` vs. `$v$` with `$u$` along the x-axis and `$v$` along the y-axis.
+2.  Do the same but for  `$u=\cos(\omega t)$` and  `$v=\cos(\omega t)$`.
+2.  Do the same but for  `$u=\cos(\omega t)$` and  `$v=2\cos(\omega t)$`.
+3.  Do the same but for  `$u=\cos(\omega t)$` and  `$v=0$`.
+
+--
+
+This is an illustration of something called *polarization*.  The pair of signals in (1) is said to be circularly polarized while the others are linearly polarized.
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+# What's with the `$i$`?
+
+Why do we use `$i$`?  It is simply a convenient way of grouping two variables.
+
+When we write `$u+iv$`, this means:
+
+&ldquo;Put `$u$` along the x-axis and `$v$` along the y-axis.&rdquo;
+
+There is then a very convenient shorthand
+
+`\[ \cos(\omega t)+i \sin(\omega t)=e^{i\omega t}\]`
+
+which helps us represent pairs of variables.  Note that this implies
+
+`\[ \frac{1}{2}\left[e^{i\omega t} + e^{-i\omega t} \right]= \cos(\omega t)\]`
+
+`\[ \frac{1}{2}\left[Ae^{i\phi}e^{i\omega t} + Ae^{-i\phi}e^{-i\omega t} \right]= A\cos(\omega t+\phi)\]`
+
+which makes this useful for representing real-valued signals as well!
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#  A Note on Discrete Time
+
+When we work with discrete time series over finite durations, sinusoids look a little different.
+
+`\[ u=\cos(2\pi f t)\quad\quad \Longleftrightarrow \quad \quad u=\cos(2\pi m n \Delta/ N)\]`
+
+The right-hand side is a sinusoid at observed at discrete times and oscillating at discrete frequencies.  We can note that
+
+<!--We can relate the continuous and discrete variables as follows:-->
+
+`\[ t = n\Delta,\quad\quad \quad  f = m/N\]`
+
+So the discrete sinusoid is between understood as
+
+`\[ u=\cos\left(2\pi (n \Delta) (m/N)\right)\]`
+
+However, it's convenient in numerical implementations to *set* `$\Delta =1$`.  Then a discrete sinusoid is written as
+
+`\[ u=\cos\left(2\pi n m/N\right)\]`
+
+where we remember to see `$m/N$` as being grouped together.  This is called the `$m$`th Fourier frequency.
+
+
 
 ---
 class: left, .toc[[&#10023;](../index.html)]
@@ -540,6 +602,24 @@ Frequencies present in the data above the Nyquist frequency experience the pheno
 The Rayleigh frequency `$f^\mathcal{R} =\frac{1}{N\Delta}$`
 
 This sets both the *lowest* Fourier frequency, and the interval *between* adjacent frequencies&mdash;a.k.a. the frequency resolution.
+
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+# In-Class Exercises
+
+Please use the programming language of your choice to do the following exercises. When a quantity is complex-valued, plot both its real and imaginary parts. Try to  explain what you see in each step based on what you have learned so far.
+
+
+
+1.  For `$N=100$` points and `$n=0,1,\ldots, 99$`, plot the three signals `$e^{i2\pi n f}$` with `$f=0,1/10$`, 1/2.
+2.  Plot the Fourier transforms found using FFT of each of those three signals. 
+3.  Plot the inverse Fourier transforms using IFFT of the three signals resulting from step (2).
+5.  What happens in (1) and (2) if you take `$f=11/10$`?
+6.  What happens in (1) and (2) if you take  `$\cos(2\pi n f)$` or  `$\sin(2\pi n f)$`?
+
+
+
 
 ---
 class: center, .toc[[&#10023;](../index.html)]
@@ -818,7 +898,7 @@ Using `$\cos A\cos B=\frac{1}{2}\left[\cos(A+B)+\cos(A-B)\right]$,` we find
 `\begin{multline}\sum_{n=0}^{N-1} \cos(2\pi p n/N)\cos(2\pi qn/N)
   \\=\sum_{n=0}^{N-1}\frac{1}{2}\left[\cos\left(2\pi(p+q)n/N\right)+\cos\left(2\pi(p-q)n/N\right)\right].\end{multline}`
 
-Both terms are of the form `$\cos\left(2\pi kn/N\right)$` where is an integer.  If `$k\ne 0$`, both terms execute an integer number of complete periods as `$n$` varies from `$0$` to `$N-1$`, so that `$\sum_{n=0}^{N-1}\cos\left(2\pi kn/N\right)=0$`.  If `$p=q$` however, then the second term is always `$\cos (0)=1$`.
+Both terms are of the form `$\cos\left(2\pi kn/N\right)$` where `$k$` is an integer.  If `$k\ne 0$`, both terms execute an integer number of complete periods as `$n$` varies from `$0$` to `$N-1$`, so that `$\sum_{n=0}^{N-1}\cos\left(2\pi kn/N\right)=0$`.  If `$p=q$` however, then the second term is always `$\cos (0)=1$`.
 
 If `$N$` is even and `$k=1$`, `$\cos\left(2\pi(n+N/2)/N\right)=\cos\left(2\pi n/N+\pi\right)$`, the first `$N/2$` terms cancel the last `$N/2$` terms.
 
@@ -865,11 +945,18 @@ The choice of notation is of a matter of taste.  However, in my experience the s
 class: left, .toc[[&#10023;](../index.html)]
 #Homework
 
-1.  Determine the sample rate, Nyquist frequency, and Rayleigh frequency for your time series.
-2.  Are there important processes that are not resolved by your sampling?  Are the major tidal components resolved?  The annual cycle?  The diurnal cycle?  Think of important processes and explain why these are or not these are resolved.  Don't forget to consider processes that are both too fast and too slow for you to resolve.
-1.  Work through the algebra (for even `$N$`) showing that frequencies above the Nyquist can be thought of as negatively-rotating circles.
-1.  Work through the algebra (for even `$N$`) showing that the discrete Fourier transform of a real-valued `$z_n$` can be rewritten as a sum over sines and cosines.
-1.  Work through the algebra  showing that oppositely-rotating circles sum to an ellipse; see slide 9 of this lecture.
+1.  Write down the definitions of the sampling interval,  Nyquist frequency, and Rayleigh frequency.  Sketch what these look like.  Determine these for your time series in units that you can relate to, e.g. one cycle per day not `$2\pi$` radians per 86,400 seconds.
+2.  Are there important processes that are not resolved by your sampling?  Are, e.g., the major tidal components resolved?  The annual cycle?  The diurnal cycle?  Think of important processes and explain why these are or not these are resolved.  Don't forget to consider processes that are both too fast and too slow.
+1.  In your  notebook, go over any homework problems from yesterday that you didn't complete on slides 1/3 and 3/3 (you can skip slide 2/3) at the end of the Frequency Basics lecture.
+1.  If you didn't do so already, complete the assignment on slide 29.  Make sure your answers match those on slides 30.
+1.  Memorize the forms of the discrete inverse and forward Fourier transforms on slide 28, and understand what the  symbols mean.  You should be able to write these out from memory.  
+1. Use the material in the notes to verify in your notebook the two-sided expansion of the Fourier representation, the second equation on slide 36, beginning with the first, for `$N$` being even.
+<!--1.  Explicitly write out the terms in the spectral representation (or Discrete Inverse Fourier Transform) at the top of slide 32 for the case of N=6.  Note the mean, positive Rayleigh, negative Rayleigh, and Nyquist components. --> 
+
+
+<!--1.  Work through the algebra (see slide 33) showing that frequencies above the Nyquist can be thought of as negatively-rotating circles.  Assume that `$N$` is even.
+1.  Work through the algebra  showing that oppositely-rotating circles sum to an ellipse; see slide 9 of this lecture.-->
+<!--1.  Work through the algebra (for even `$N$`) showing that the discrete Fourier transform of a real-valued `$z_n$` can be rewritten as a sum over sines and cosines.-->
 
 <!--1. Read the help for Matlab's <tt>fft</tt> and compare with the notation on p. 20.  Do they agree?
 1.  Take the discrete Fourier transform of your data using <tt>fft</tt>, then invert this using <tt>ifft</tt>.  Compare with the original.

@@ -121,15 +121,15 @@ The ninety-degree rotation matrix is `$\mathbf{J}(\pi/2)$`, while `$\mathbf{J}(\
 class: left, .toc[[&#10023;](../index.html)]
 #  Review: Matrix Basics
 
-Recall that a matrix `$\mathbf{M}$` is said to be *unitary* if
+Recall that a real-valued matrix `$\mathbf{M}$` is said to be *orthogonal* if
 
 `\[\mathbf{M}^T\mathbf{M} = \mathbf{I} = \begin{bmatrix}1 & 0 \\ 0 & 1\end{bmatrix} \]`
 
 where &ldquo;`$T$`&rdquo; represents the *matrix transpose*, and `$\mathbf{I}$` is called the *identity matrix*.
 
-For a unitary matrix, `$\mathbf{M}^T\mathbf{M}\,\mathbf{z}=\mathbf{z}$`, i.e. when the matrix and its transpose operate in succession, nothing happens.
+For an orthogonal matrix, `$\mathbf{M}^T\mathbf{M}\,\mathbf{z}=\mathbf{z}$`, i.e. when the matrix and its transpose operate in succession, nothing happens.
 
-We can see that the rotation matrix `$\mathbf{J}(\theta)$` is unitary since
+We can see that the rotation matrix `$\mathbf{J}(\theta)$` is orthogonal since
 `\[\mathbf{J}^T(\theta)\,\mathbf{J}(\theta) =
   \begin{bmatrix}\cos\theta & \sin\theta \\ -\sin\theta & \cos \theta \end{bmatrix}
   \begin{bmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos \theta \end{bmatrix}=\begin{bmatrix}1 & 0 \\ 0 & 1\end{bmatrix}.
@@ -428,9 +428,9 @@ Note, it is *not* the case that `$\mathrm{tr}\left\{\mathbf{AB}\right\}=\mathrm{
 class: left, .toc[[&#10023;](../index.html)]
 #Generalization to `$N>2$`
 
-Let's say that instead of two signal components, `$u$` and `$v$`, we have many, `$\mathbf{z}\equiv [z_1\,\,\,z_2\,\,\,\ldots \,\,\, z_N]^T$`.
+Let's say that instead of two signal components, `$u$` and `$v$`, we have many, `$\mathbf{z}_n\equiv [z_{1,n}\,\,\,z_{2,n}\,\,\,\ldots \,\,\, z_{M,n}]^T$`, i.e.  `$M$` time series with `$N$` points.
 
-A common application is where the `$z_n$` are taken from a spatial grid, which we re-organize into a single column vector for convenience.
+A common application is where the `$M$` components are taken from a spatial grid, which we re-organize into a single column vector for convenience.
 
 We then form the covariance matrix and take its eigenvalue decomposition as before
 
@@ -444,15 +444,39 @@ In this `$N$`-dimensional case, `$\mathrm{tr}\left\{\mathbf{\Sigma}\right\}/N$` 
 class: left, .toc[[&#10023;](../index.html)]
 #Generalization to `$N>2$`
 
+Let's organize the set of `$N$` time series as a matrix.  Defining
+
+`\[\overline{\mathbf{z}}\equiv \frac{1}{N} \sum_{n=1}^N \mathbf{z}_n,\quad\quad\quad \mathbf{z}_n'\equiv\mathbf{z}_n-\overline{\mathbf{z}} \]`
+
+`\[\mathbf{Z}\equiv \overset{\longleftarrow~N~\mathrm{time~points}~\longrightarrow}{\left.\begin{bmatrix} z_{1,1}' & z_{1,2}'  &\ldots  &z_{1,N}' \\
+z_{2,1}' & z_{2,2}' &\ldots  &z_{2,N}'\\
+\vdots & \vdots  &\ddots & \vdots \\
+z_{M,1}' & z_{M,2}'  &\ldots  &z_{M,N}'
+\end{bmatrix}\, \right\}}~M~\mathrm{components}\]`
+
+Then we can form the covariance matrix through a multiplication,
+
+`\[\mathbf{\Sigma}\equiv \frac{1}{N}\mathbf{Z}\mathbf{Z}^T =\mathbf{U}\,\mathbf{D}\,\mathbf{U}^T \quad\quad\quad (M\times M) \]`
+
+and  take its eigenvalue decomposition.
+
+<!-- we have done what is known as an EOF (Empirical Orthgonal Function) analysis.-->
+
+---
+class: left, .toc[[&#10023;](../index.html)]
+#Generalization to `$N>2$`
+
 Transforming the original variables as
 
-`\[\widetilde{\mathbf{z}} \equiv  \begin{bmatrix}\widetilde{z}_1 & \widetilde{z}_2 & \ldots &  \widetilde{z}_N\end{bmatrix} \equiv \mathbf{U}^T\mathbf{z} \]`
+`\[\widetilde{\mathbf{Z}} \equiv  \mathbf{U}^T\mathbf{Z},\quad\quad\quad \frac{1}{N} \widetilde{\mathbf{Z}} \,\widetilde{\mathbf{Z}}^T=\mathbf{D}\]`
 
-we obtain `$ \widetilde{z}_1$` as the orthogonal transformation (linear combination preserving the vector length `$\|\mathbf{z}\|$`) of the original time series having the maximum variance.
+the rows of `$\widetilde{\mathbf{Z}}$` are now time series of variability along  "generalized directions" corresponding to   `$\mathbf{U}$`.
 
-Another way to say this is that `$ \widetilde{z}_1$` is the time series along the "generalized direction" that maximizes variance,  `$ \widetilde{z}_2$` is the time series along the generalized direction that maximizes variances and that is also orthogonal to the direction of `$\widetilde{z}_1$`, etc.
+<!-- we obtain `$ \widetilde{z}_1$` as the orthogonal transformation (linear combination preserving the vector length `$\|\mathbf{z}\|$`) of the original time series having the maximum variance.-->
 
-These are the *principal components*.  The columns of `$\mathbf{U}$` correspond to spatial patterns if we rearrange them back onto the grid.  The magnitudes of these components are the elements of the diagnonal matrix `$\mathbf{D}$`, `$d_1$`, `$d_2$`, ... `$d_N$`. That's EOF analysis in a nutshell.
+The first row of `$\widetilde{\mathbf{Z}}$` is the time series of variability along the generalized direction that maximizes variance, the second row is the time series along the generalized direction that maximizes variances and that is also orthogonal to the direction of the first, etc.
+
+These are the *principal components*.  The columns of `$\mathbf{U}$` correspond to spatial patterns if we rearrange them back onto the grid.  The variance of these components are the elements of the diagnonal matrix `$\mathbf{D}$`, `$d_1$`, `$d_2$`, ... `$d_N$`. That's EOF analysis in a nutshell.
 
 The variance ellipse is geometric expression of a `$2\times 2$` EOF analysis.
 
